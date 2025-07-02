@@ -2,8 +2,12 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from utils import file_formatter, ast_parser
 import os
 import tempfile
+import uuid
 
 app = FastAPI()
+
+STORED_SOL_DIR = "uploaded_sols"
+os.makedirs(STORED_SOL_DIR, exist_ok=True)
 
 @app.post("/upload")
 async def upload_contract(file: UploadFile = File(...)):
@@ -11,6 +15,12 @@ async def upload_contract(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Only .sol files are allowed")
     
     contents = await file.read()
+    
+    file_id = str(uuid.uuid4())
+    stored_path = os.path.join(STORED_SOL_DIR, f"{file_id}.sol")
+    with open(stored_path, 'wb') as f:
+        f.write(contents)
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix=".sol") as tmp:
         tmp.write(contents)
         filepath = tmp.name
@@ -25,9 +35,9 @@ async def upload_contract(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")
 
         return {
-            "formatted": formatted,
+            "file_id" : file_id,
+            "file_name": file.filename,
             "ast": ast_result["ast"],
-            "compiled_output": ast_result["compiled_output"]
         }
         
     except Exception as e:

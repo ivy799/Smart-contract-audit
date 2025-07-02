@@ -1,9 +1,6 @@
 import solcx
 
-def parse_ast(solidity_code):
-    """
-    Parse Solidity code and return AST
-    """
+def parse_ast(path):
     try:
         try:
             solcx.set_solc_version('0.8.20')
@@ -15,14 +12,14 @@ def parse_ast(solidity_code):
             "language": "Solidity",
             "sources": {
                 "contract.sol": {
-                    "content": solidity_code
+                    "content": path
                 }
             },
             "settings": {
                 "outputSelection": {
                     "*": {
                         "*": ["abi", "evm.bytecode", "evm.deployedBytecode"],
-                        "": ["ast"]  
+                        "": ["ast"]
                     }
                 }
             }
