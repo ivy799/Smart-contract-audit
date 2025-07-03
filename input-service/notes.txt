@@ -1,0 +1,5 @@
+Pada input service terdapat 2 endpoint. Endpoint pertama menerima file mentah (raw file), sedangkan endpoint kedua menerima token (kontrak yang valid) sebagai input.
+
+Kedua endpoint menghasilkan struktur respons yang sama, kecuali pada bagian source (endpoint 1: token, endpoint 2: filePath).
+
+Proses pre-processing masih sangat dasar dan saat ini fokus utama adalah agar sistem dapat menerima berbagai jenis input.
