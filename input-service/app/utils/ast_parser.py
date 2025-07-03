@@ -1,98 +1,160 @@
 import solcx
 import re
-import os
-import tempfile
+from packaging import version
+from typing import Tuple, Optional, List, Dict, Any
 
-def detect_solidity_version(content):
-    pragma_pattern = r'pragma\s+solidity\s+([^;]+);'
-    matches = re.findall(pragma_pattern, content)
-    
-    if matches:
-        version_spec = matches[0].strip()
-        print(f"DEBUG: Found pragma solidity {version_spec}")
-        
-        if re.match(r'^\d+\.\d+\.\d+$', version_spec):
-            return version_spec
-
-        version_clean = re.sub(r'[^\d\.]', '', version_spec)
-
-        version_parts = version_clean.split('.')
-        if len(version_parts) >= 2:
-            major_minor = f"{version_parts[0]}.{version_parts[1]}"
-            
-            if major_minor == '0.3':
-                return '0.4.26'  
-            elif major_minor == '0.4':
-                return '0.4.26'
-            elif major_minor == '0.5':
-                return '0.5.17'
-            elif major_minor == '0.6':
-                return '0.6.12'
-            elif major_minor == '0.7':
-                return '0.7.6'
-            elif major_minor == '0.8':
-                if len(version_parts) >= 3:
-                    patch = int(version_parts[2])
-                    if patch >= 29:
-                        return '0.8.29'  
-                    elif patch >= 20:
-                        return '0.8.20'
-                    else:
-                        return '0.8.20'  
-                return '0.8.20'
-            else:
-                return '0.8.20'
-        else:
-            return '0.8.20'
-    
-    print("DEBUG: No pragma found, using default 0.8.20")
-    return '0.8.20'
-
-def get_available_solc_versions():
+def ensure_solc_version_available(target_version: str) -> bool:
     try:
-        return solcx.get_available_solc_versions()
-    except:
-        return []
-
-def install_solc_version(version):
-    try:
-        print(f"DEBUG: Attempting to install Solidity {version}")
-        solcx.install_solc(version)
-        solcx.set_solc_version(version)
-        print(f"DEBUG: Successfully installed and set Solidity {version}")
-        return version
+        installed_versions = [str(v) for v in solcx.get_installed_solc_versions()]
+        if target_version in installed_versions:
+            print(f"DEBUG: Version {target_version} already installed")
+            return True
+        print(f"DEBUG: Installing Solidity version {target_version}...")
+        solcx.install_solc(target_version, show_progress=False)
+        print(f"DEBUG: Successfully installed {target_version}")
+        return True
     except Exception as e:
-        print(f"DEBUG: Failed to install {version}: {e}")
-        
-        if version.startswith('0.8.'):
-            fallback_versions = ['0.8.24', '0.8.23', '0.8.22', '0.8.21', '0.8.20', '0.8.19']
-        elif version.startswith('0.7.'):
-            fallback_versions = ['0.7.6']
-        elif version.startswith('0.6.'):
-            fallback_versions = ['0.6.12']
-        elif version.startswith('0.5.'):
-            fallback_versions = ['0.5.17']
+        print(f"DEBUG: Failed to install {target_version}: {e}")
+        return False
+
+def extract_all_pragma_versions(content: str) -> list:
+    pragma_patterns = [
+        r'pragma\s+solidity\s+([^;]+);',
+        r'pragma\s+solidity\s*([^;]+);',
+        r'//\s*pragma\s+solidity\s+([^;]+);'
+    ]
+    versions = []
+    for pattern in pragma_patterns:
+        matches = re.findall(pattern, content, re.IGNORECASE | re.MULTILINE)
+        for m in matches:
+            versions.append(m.strip())
+    return versions
+
+def parse_version_spec(version_spec: str) -> Tuple[str, str]:
+    version_spec = version_spec.strip()
+    if re.match(r'^\d+\.\d+\.\d+$', version_spec):
+        return "=", version_spec
+    caret_match = re.match(r'^\^(\d+\.\d+\.\d+)$', version_spec)
+    if caret_match:
+        return "^", caret_match.group(1)
+    range_match = re.match(r'>=\s*(\d+\.\d+\.\d+)\s*<\s*(\d+\.\d+\.\d+)', version_spec)
+    if range_match:
+        return "range", f"{range_match.group(1)}-{range_match.group(2)}"
+    operator_match = re.match(r'([><=]+)\s*(\d+\.\d+\.\d+)', version_spec)
+    if operator_match:
+        return operator_match.group(1), operator_match.group(2)
+    tilde_match = re.match(r'~(\d+\.\d+\.\d+)$', version_spec)
+    if tilde_match:
+        return "~", tilde_match.group(1)
+    version_clean = re.sub(r'[^\d\.]', '', version_spec)
+    if re.match(r'^\d+\.\d+(\.\d+)?$', version_clean):
+        return "~", version_clean if version_clean.count('.') == 2 else version_clean + '.0'
+    return "unknown", version_spec
+
+def get_most_strict_pragma_version(versions: list) -> str:
+
+    if not versions:
+        raise Exception("No pragma solidity found in source code.")
+
+    exact_versions = []
+    range_versions = []
+
+    for v in versions:
+        op, val = parse_version_spec(v)
+        if op == "=":
+            exact_versions.append(val)
         else:
-            fallback_versions = ['0.4.26']
-        
-        for fallback in fallback_versions:
-            try:
-                print(f"DEBUG: Trying fallback version: {fallback}")
-                solcx.install_solc(fallback)
-                solcx.set_solc_version(fallback)
-                print(f"DEBUG: Successfully using fallback version: {fallback}")
-                return fallback
-            except Exception as fallback_e:
-                print(f"DEBUG: Fallback {fallback} also failed: {fallback_e}")
-                continue
-        
-        raise Exception(f"Could not install any compatible Solidity version for {version}")
+            range_versions.append((op, val))
+
+    if exact_versions:
+        majors = set(ver.split('.')[0] for ver in exact_versions)
+        if len(majors) > 1:
+            raise Exception(f"Conflicting pragma versions found: {exact_versions}")
+        return max(exact_versions, key=lambda x: version.parse(x))
+
+    if range_versions:
+        candidates = []
+        for op, val in range_versions:
+            candidates.append(val)
+        majors = set(ver.split('.')[0] for ver in candidates)
+        if len(majors) > 1:
+            raise Exception(f"Conflicting pragma major versions found (range): {candidates}")
+        return max(candidates, key=lambda x: version.parse(x))
+
+    raise Exception("No valid pragma found.")
+
+def find_precise_version(version_spec: str) -> Optional[str]:
+    """Always return the most precise version from the code's pragma statement"""
+    if not version_spec:
+        return None
+    operator, target_version = parse_version_spec(version_spec)
+    try:
+        available_versions = solcx.get_available_solc_versions()
+        available_str = [str(v) for v in available_versions]
+    except Exception as e:
+        print(f"DEBUG: Error getting versions: {e}")
+        available_str = []
+    if operator == "=":
+        if target_version in available_str:
+            return target_version
+        else:
+            print(f"DEBUG: Exact version {target_version} not available in list, will try to install anyway.")
+            return target_version
+    elif operator in ("^", "~", "range", ">=", "<=", ">", "<"):
+        if operator == "^" or operator == "~":
+            major_minor = '.'.join(target_version.split('.')[:2])
+            filtered = [v for v in available_str if v.startswith(major_minor) and version.parse(v) >= version.parse(target_version)]
+            if filtered:
+                return max(filtered, key=lambda x: version.parse(x))
+            return target_version
+        elif operator == "range":
+            min_ver, max_ver = target_version.split('-')
+            filtered = [v for v in available_str if version.parse(min_ver) <= version.parse(v) < version.parse(max_ver)]
+            if filtered:
+                return max(filtered, key=lambda x: version.parse(x))
+            return min_ver
+        elif operator in [">=", ">", "<=", "<"]:
+            filtered = []
+            if operator == ">=":
+                filtered = [v for v in available_str if version.parse(v) >= version.parse(target_version)]
+            elif operator == ">":
+                filtered = [v for v in available_str if version.parse(v) > version.parse(target_version)]
+            elif operator == "<=":
+                filtered = [v for v in available_str if version.parse(v) <= version.parse(target_version)]
+            elif operator == "<":
+                filtered = [v for v in available_str if version.parse(v) < version.parse(target_version)]
+            if filtered:
+                return max(filtered, key=lambda x: version.parse(x))
+            return target_version
+    return target_version
+
+def set_solidity_version_from_code(version_spec: str) -> str:
+    print(f"DEBUG: Setting Solidity version for pragma spec: {version_spec}")
+    target_version = find_precise_version(version_spec)
+    if not target_version:
+        raise Exception("No version specification found in pragma.")
+    if ensure_solc_version_available(target_version):
+        try:
+            solcx.set_solc_version(target_version)
+            print(f"DEBUG: Successfully set version: {target_version}")
+            return target_version
+        except Exception as e:
+            print(f"DEBUG: Failed to set version {target_version}: {e}")
+            raise Exception(f"Could not set Solidity version: {target_version}")
+    else:
+        raise Exception(f"Could not install Solidity version: {target_version}")
+
+def detect_solidity_version(content: str) -> str:
+    pragma_versions = extract_all_pragma_versions(content)
+    if not pragma_versions:
+        raise Exception("No pragma solidity version found in input code.")
+    target_version = get_most_strict_pragma_version(pragma_versions)
+    return set_solidity_version_from_code(target_version)
 
 def clean_multiple_spdx_licenses(content):
     lines = content.split('\n')
     spdx_found = False
     cleaned_lines = []
-    
     for line in lines:
         if re.search(r'//\s*SPDX-License-Identifier:', line, re.IGNORECASE):
             if not spdx_found:
@@ -104,67 +166,44 @@ def clean_multiple_spdx_licenses(content):
                 continue
         else:
             cleaned_lines.append(line)
-    
     return '\n'.join(cleaned_lines)
 
 def strip_imports_and_focus_on_main_code(content):
-
     lines = content.split('\n')
     filtered_lines = []
     removed_imports = []
-    
     for line in lines:
         stripped_line = line.strip()
-        
         if (stripped_line.startswith('import ') or 
             re.match(r'^\s*import\s+', line)):
             removed_imports.append(line.strip())
             print(f"DEBUG: Removing import: {line.strip()}")
             continue
-        
         filtered_lines.append(line)
-    
     filtered_content = '\n'.join(filtered_lines)
-    
     print(f"DEBUG: Removed {len(removed_imports)} import statements")
     print(f"DEBUG: Content length reduced from {len(content)} to {len(filtered_content)} characters")
-    
     return filtered_content, removed_imports
 
 def preprocess_solidity_content(content):
     print("DEBUG: Starting content preprocessing...")
-    
     content = clean_multiple_spdx_licenses(content)
     processed_content, removed_imports = strip_imports_and_focus_on_main_code(content)
-    
     print(f"DEBUG: Removed {len(removed_imports)} import statements")
-    
     return processed_content, removed_imports
 
-def parse_ast(content):
-    """Parse AST from Solidity content focusing only on the main contract code"""
+def parse_ast(content: str) -> Dict[str, Any]:
     try:
         print(f"DEBUG: Content length: {len(content)} characters")
         print(f"DEBUG: Content preview: {content[:200]}...")
-        
         processed_content, removed_imports = preprocess_solidity_content(content)
-        
-        detected_version = detect_solidity_version(processed_content)
-        print(f"DEBUG: Detected Solidity version: {detected_version}")
-        
-        try:
-            solcx.set_solc_version(detected_version)
-            print(f"DEBUG: Using already installed Solidity {detected_version}")
-            actual_version = detected_version
-        except Exception:
-            actual_version = install_solc_version(detected_version)
-        
+        actual_version = detect_solidity_version(processed_content)
+        print(f"DEBUG: Using Solidity version: {actual_version}")
         sources = {
             "contract.sol": {
                 "content": processed_content
             }
         }
-        
         input_json = {
             "language": "Solidity",
             "sources": sources,
@@ -174,38 +213,38 @@ def parse_ast(content):
                         "*": ["abi", "evm.bytecode", "evm.deployedBytecode"],
                         "": ["ast"]
                     }
-                }
+                },
+                "optimizer": {
+                    "enabled": False
+                },
+                "remappings": []
             }
         }
-        
         print(f"DEBUG: Compiling with Solidity {actual_version}...")
-        print(f"DEBUG: Compiling main contract only (no dependencies)")
         output_json = solcx.compile_standard(input_json)
-        
         compilation_warnings = []
         if "errors" in output_json:
             errors = output_json["errors"]
             fatal_errors = [e for e in errors if e.get("severity") == "error"]
             warning_errors = [e for e in errors if e.get("severity") in ["warning", "info"]]
-            
             if fatal_errors:
                 error_messages = [e.get("formattedMessage", e.get("message", str(e))) for e in fatal_errors]
+                print(f"DEBUG: Fatal compilation errors: {error_messages}")
                 raise Exception(f"Compilation errors: {'; '.join(error_messages)}")
             else:
-                print(f"DEBUG: Non-fatal warnings: {len(errors)} warnings found")
+                print(f"DEBUG: Non-fatal warnings: {len(warning_errors)} warnings found")
                 compilation_warnings = [e.get("formattedMessage", e.get("message", str(e))) for e in warning_errors]
-        
         ast_data = None
         if "sources" in output_json and "contract.sol" in output_json["sources"]:
             if "ast" in output_json["sources"]["contract.sol"]:
                 ast_data = output_json["sources"]["contract.sol"]["ast"]
                 print(f"DEBUG: Successfully extracted AST from main contract")
-        
         if not ast_data:
             print("DEBUG: AST not found in expected location")
             print(f"DEBUG: Available keys in output: {list(output_json.keys())}")
+            if "sources" in output_json:
+                print(f"DEBUG: Available sources: {list(output_json['sources'].keys())}")
             raise Exception("AST data not found in compilation output")
-        
         return {
             "success": True,
             "ast": ast_data,
@@ -214,7 +253,6 @@ def parse_ast(content):
             "warnings": compilation_warnings,
             "removed_imports": removed_imports
         }
-        
     except Exception as e:
         print(f"DEBUG: Parse AST error: {str(e)}")
         return {
