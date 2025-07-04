@@ -1,5 +1,59 @@
 import requests
-import time
+import json
+
+def is_abi_only(source_code):
+    if not source_code:
+        return False
+    
+    source_code_stripped = source_code.strip()
+    
+    if (source_code_stripped.startswith('[') or 
+        source_code_stripped.startswith('{') or 
+        source_code_stripped.startswith('{{')):
+        
+        try:
+            content_to_parse = source_code_stripped
+            if content_to_parse.startswith('{{'):
+                try:
+                    parsed = json.loads(content_to_parse)
+                    if isinstance(parsed, dict):
+                        if "SourceCode" in parsed:
+                            return True
+                        return True
+                except json.JSONDecodeError:
+                    return True
+            else:
+                parsed = json.loads(content_to_parse)
+                if isinstance(parsed, (list, dict)):
+                    return True
+        except json.JSONDecodeError:
+            pass
+    
+    solidity_keywords = [
+        'pragma solidity',
+        'contract ',
+        'interface ',
+        'library ',
+        'function ',
+        'modifier ',
+        'event ',
+        'struct ',
+        'mapping',
+        'uint256',
+        'address',
+        'bool'
+    ]
+    
+    content_lower = source_code_stripped.lower()
+    keyword_found = any(keyword in content_lower for keyword in solidity_keywords)
+    
+    if not keyword_found:
+        return True
+    
+    if len(source_code_stripped) < 50 and not any(kw in content_lower for kw in ['contract', 'pragma', 'function']):
+        return True
+    
+    return False
 
 def get_contract_source(address, api_key):
     if not api_key:
@@ -44,6 +98,9 @@ def get_contract_source(address, api_key):
         
         if not source_code:
             raise Exception("Contract source code kosong - mungkin contract tidak verified")
+        
+        if is_abi_only(source_code):
+            raise Exception("Contract ini hanya memiliki ABI, bukan source code. Sistem audit memerlukan source code Solidity yang sudah di-verify di Etherscan. Pastikan contract yang Anda masukkan telah di-verify dengan source code lengkap.")
         
         return {
             "contract_name": contract_name,

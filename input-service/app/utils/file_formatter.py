@@ -9,7 +9,6 @@ def format_file(path):
     return code
 
 def format_content(content):
-    """Format Solidity code from string content"""
     if not content:
         return ""
     

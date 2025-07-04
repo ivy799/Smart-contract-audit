@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from utils import file_formatter, ast_parser, etherscan
+from utils import ast_parser, etherscan
 import os
 import tempfile
 import uuid
@@ -17,7 +17,6 @@ ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
 @app.post("/upload")
 async def upload_contract(file: UploadFile = File(...)):
-    """Upload and analyze a Solidity contract file"""
     if not file.filename.endswith('.sol'):
         raise HTTPException(status_code=400, detail="Only .sol files are allowed")
     
@@ -33,8 +32,6 @@ async def upload_contract(file: UploadFile = File(...)):
         filepath = tmp.name
 
     try:
-        formatted_code = file_formatter.format_file(filepath)
-        
         original_content = contents.decode('utf-8')
         ast_result = ast_parser.parse_ast(original_content)
         
@@ -44,7 +41,6 @@ async def upload_contract(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")
 
         return {
-            "formatted_code": formatted_code,
             "ast": ast_result["ast"],
             "file_path": stored_path,
             "warnings": ast_result.get("warnings", []),
@@ -60,16 +56,12 @@ async def upload_contract(file: UploadFile = File(...)):
 
 @app.get("/contract-from-address")
 async def get_contract(address: str):
-    """Fetch and analyze a contract from Etherscan by address/token"""
     try:
         print(f"DEBUG: Fetching contract from address: {address}")
         contract_data = etherscan.get_contract_source(address, ETHERSCAN_API_KEY)
 
         if not contract_data["source_code"]:
             raise HTTPException(status_code=404, detail="Contract source not found or not verified")
-
-        print("DEBUG: Formatting source code...")
-        formatted_code = file_formatter.format_content(contract_data["source_code"])
 
         print("DEBUG: Starting AST parsing...")
         ast_result = ast_parser.parse_ast(contract_data["source_code"])
