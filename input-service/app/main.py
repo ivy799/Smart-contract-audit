@@ -33,7 +33,12 @@ async def upload_contract(file: UploadFile = File(...)):
 
     try:
         original_content = contents.decode('utf-8')
-        ast_result = ast_parser.parse_ast(original_content)
+        
+        additional_metadata = {
+            "file_path": stored_path
+        }
+        
+        ast_result = ast_parser.parse_ast(original_content, additional_metadata)
         
         os.unlink(filepath)
 
@@ -41,11 +46,11 @@ async def upload_contract(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")
 
         return {
+            "success": ast_result["success"],
             "ast": ast_result["ast"],
-            "file_path": stored_path,
-            "warnings": ast_result.get("warnings", []),
-            "removed_imports": ast_result.get("removed_imports", []),
-            "solidity_version": ast_result.get("solidity_version")
+            "warnings": ast_result["warnings"],
+            "removed_imports": ast_result["removed_imports"],
+            "contract_metadata": ast_result["contract_metadata"]
         }
 
     except Exception as e:
@@ -64,19 +69,24 @@ async def get_contract(address: str):
             raise HTTPException(status_code=404, detail="Contract source not found or not verified")
 
         print("DEBUG: Starting AST parsing...")
-        ast_result = ast_parser.parse_ast(contract_data["source_code"])
+        
+        additional_metadata = {
+            "token_address": address,
+            "contract_name": contract_data["contract_name"]
+        }
+        
+        ast_result = ast_parser.parse_ast(contract_data["source_code"], additional_metadata)
 
         if not ast_result["success"]:
             print(f"DEBUG: AST parsing failed: {ast_result['error']}")
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")
 
         return {
+            "success": ast_result["success"],
             "ast": ast_result["ast"],
-            "token_address": address,
-            "contract_name": contract_data["contract_name"],
-            "solidity_version": ast_result.get("solidity_version"),
-            "warnings": ast_result.get("warnings", []),
-            "removed_imports": ast_result.get("removed_imports", [])
+            "warnings": ast_result["warnings"],
+            "removed_imports": ast_result["removed_imports"],
+            "contract_metadata": ast_result["contract_metadata"]
         }
 
     except HTTPException:

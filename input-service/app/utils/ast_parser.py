@@ -3,6 +3,48 @@ import re
 from packaging import version
 from typing import Tuple, Optional, List, Dict, Any
 
+def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional_info: Dict[str, Any] = None) -> Dict[str, Any]:
+    
+    metadata = {
+        "name": None,
+        "version": None,
+        "license": None,
+        "inherits": [],
+        "token_address": None,
+        "contract_name": None,
+        "solidity_version": None
+    }
+    
+    if additional_info:
+        metadata.update(additional_info)
+    
+    try:
+        if "nodes" in ast_data:
+            for node in ast_data["nodes"]:
+                if node.get("nodeType") == "ContractDefinition":
+                    metadata["name"] = node.get("name")
+                    
+                    if "baseContracts" in node:
+                        for base in node["baseContracts"]:
+                            if "baseName" in base and "name" in base["baseName"]:
+                                metadata["inherits"].append(base["baseName"]["name"])
+                    break
+        
+        pragma_versions = extract_all_pragma_versions(content)
+        if pragma_versions:
+            metadata["version"] = pragma_versions[0]
+        
+        license_match = re.search(r'//\s*SPDX-License-Identifier:\s*([^\n\r]+)', content, re.IGNORECASE)
+        if license_match:
+            metadata["license"] = license_match.group(1).strip()
+        
+        print(f"DEBUG: Extracted metadata: {metadata}")
+        return metadata
+        
+    except Exception as e:
+        print(f"DEBUG: Error extracting metadata: {e}")
+        return metadata
+
 def ensure_solc_version_available(target_version: str) -> bool:
     try:
         installed_versions = [str(v) for v in solcx.get_installed_solc_versions()]
@@ -84,7 +126,6 @@ def get_most_strict_pragma_version(versions: list) -> str:
     raise Exception("No valid pragma found.")
 
 def find_precise_version(version_spec: str) -> Optional[str]:
-    """Always return the most precise version from the code's pragma statement"""
     if not version_spec:
         return None
     operator, target_version = parse_version_spec(version_spec)
@@ -192,18 +233,21 @@ def preprocess_solidity_content(content):
     print(f"DEBUG: Removed {len(removed_imports)} import statements")
     return processed_content, removed_imports
 
-def parse_ast(content: str) -> Dict[str, Any]:
+def parse_ast(content: str, additional_metadata: Dict[str, Any] = None) -> Dict[str, Any]:
     try:
         print(f"DEBUG: Content length: {len(content)} characters")
         print(f"DEBUG: Content preview: {content[:200]}...")
+        
         processed_content, removed_imports = preprocess_solidity_content(content)
         actual_version = detect_solidity_version(processed_content)
         print(f"DEBUG: Using Solidity version: {actual_version}")
+        
         sources = {
             "contract.sol": {
                 "content": processed_content
             }
         }
+        
         input_json = {
             "language": "Solidity",
             "sources": sources,
@@ -220,13 +264,16 @@ def parse_ast(content: str) -> Dict[str, Any]:
                 "remappings": []
             }
         }
+        
         print(f"DEBUG: Compiling with Solidity {actual_version}...")
         output_json = solcx.compile_standard(input_json)
+        
         compilation_warnings = []
         if "errors" in output_json:
             errors = output_json["errors"]
             fatal_errors = [e for e in errors if e.get("severity") == "error"]
             warning_errors = [e for e in errors if e.get("severity") in ["warning", "info"]]
+            
             if fatal_errors:
                 error_messages = [e.get("formattedMessage", e.get("message", str(e))) for e in fatal_errors]
                 print(f"DEBUG: Fatal compilation errors: {error_messages}")
@@ -234,29 +281,51 @@ def parse_ast(content: str) -> Dict[str, Any]:
             else:
                 print(f"DEBUG: Non-fatal warnings: {len(warning_errors)} warnings found")
                 compilation_warnings = [e.get("formattedMessage", e.get("message", str(e))) for e in warning_errors]
+        
         ast_data = None
         if "sources" in output_json and "contract.sol" in output_json["sources"]:
             if "ast" in output_json["sources"]["contract.sol"]:
                 ast_data = output_json["sources"]["contract.sol"]["ast"]
                 print(f"DEBUG: Successfully extracted AST from main contract")
+        
         if not ast_data:
             print("DEBUG: AST not found in expected location")
             print(f"DEBUG: Available keys in output: {list(output_json.keys())}")
             if "sources" in output_json:
                 print(f"DEBUG: Available sources: {list(output_json['sources'].keys())}")
             raise Exception("AST data not found in compilation output")
+        
+        metadata_info = {
+            "solidity_version": actual_version
+        }
+        if additional_metadata:
+            metadata_info.update(additional_metadata)
+        
+        contract_metadata = extract_contract_metadata(ast_data, content, metadata_info)
+        
         return {
             "success": True,
             "ast": ast_data,
-            "compiled_output": output_json,
-            "solidity_version": actual_version,
             "warnings": compilation_warnings,
-            "removed_imports": removed_imports
+            "removed_imports": removed_imports,
+            "contract_metadata": contract_metadata
         }
+        
     except Exception as e:
         print(f"DEBUG: Parse AST error: {str(e)}")
         return {
             "success": False,
             "error": str(e),
-            "ast": None
+            "ast": None,
+            "warnings": [],
+            "removed_imports": [],
+            "contract_metadata": {
+                "name": None,
+                "version": None,
+                "license": None,
+                "inherits": [],
+                "token_address": None,
+                "contract_name": None,
+                "solidity_version": None
+            }
         }
