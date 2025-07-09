@@ -4,3 +4,4 @@ python-multipart
 py-solc-x
 python-dotenv
 requests
+azure-storage-blob==12.19.0

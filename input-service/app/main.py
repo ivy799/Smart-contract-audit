@@ -1,11 +1,20 @@
+import os
+import uuid
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from app.utils import ast_parser, etherscan
-import os
-import tempfile
-import uuid
+from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import generate_blob_sas, BlobSasPermissions
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
+
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+AZURE_CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
+
+blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME)
+
 
 app = FastAPI()
 
@@ -26,22 +35,30 @@ async def upload_contract(file: UploadFile = File(...)):
     temp_stored_path = os.path.join(TEMP_SOL_DIR, f"{file_id}_{file.filename}")
     
     try:
-        with open(temp_stored_path, 'wb') as f:
-            f.write(contents)
+        blob_name = f"{file_id}_{file.filename}"
+        blob_client = container_client.get_blob_client(blob_name)
+        blob_client.upload_blob(contents, overwrite=True)
+
+        sas_token = generate_blob_sas(
+            account_name=blob_service_client.account_name,
+            container_name=AZURE_CONTAINER_NAME,
+            blob_name=blob_name,
+            account_key=blob_service_client.credential.account_key,
+            permission=BlobSasPermissions(read=True),
+            expiry=datetime.utcnow() + timedelta(hours=1),  
+        )
+
+        blob_url_with_sas = f"https://{blob_service_client.account_name}.blob.core.windows.net/{AZURE_CONTAINER_NAME}/{blob_name}?{sas_token}"
 
         original_content = contents.decode('utf-8')
-        
+
         additional_metadata = {
-            "token_address": None,  
-            "contract_name": None,  
-            "file_path": temp_stored_path,  
+            "token_address": None,
+            "contract_name": None,
+            "file_path": blob_url_with_sas, 
         }
-        
+
         ast_result = ast_parser.parse_ast(original_content, additional_metadata)
-        
-        # if os.path.exists(temp_stored_path):
-        #     os.unlink(temp_stored_path)
-        #     print(f"DEBUG: Cleaned up temporary file: {temp_stored_path}")
 
         if not ast_result["success"]:
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")
