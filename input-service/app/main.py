@@ -35,15 +35,13 @@ async def upload_contract(file: UploadFile = File(...)):
             "token_address": None,  
             "contract_name": None,  
             "file_path": temp_stored_path,  
-            "original_filename": file.filename,
-            "upload_session_id": file_id
         }
         
         ast_result = ast_parser.parse_ast(original_content, additional_metadata)
         
-        if os.path.exists(temp_stored_path):
-            os.unlink(temp_stored_path)
-            print(f"DEBUG: Cleaned up temporary file: {temp_stored_path}")
+        # if os.path.exists(temp_stored_path):
+        #     os.unlink(temp_stored_path)
+        #     print(f"DEBUG: Cleaned up temporary file: {temp_stored_path}")
 
         if not ast_result["success"]:
             raise HTTPException(status_code=400, detail=f"AST parsing failed: {ast_result['error']}")

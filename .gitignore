@@ -3,3 +3,4 @@ venv/
 *.pyc
 .env
 input-service/app/.env
+input-service/temp_uploads/
