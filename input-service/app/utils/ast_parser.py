@@ -4,7 +4,6 @@ from packaging import version
 from typing import Tuple, Optional, List, Dict, Any
 
 def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional_info: Dict[str, Any] = None) -> Dict[str, Any]:
-    # Mulai dengan metadata default
     metadata = {
         "name": None,
         "version": None,
@@ -12,26 +11,22 @@ def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional
         "inherits": [],
         "contract_name": None,
         "solidity_version": None,
-        "token_address": None  # Default null
+        "token_address": None 
     }
     
-    # Update dengan additional_info TERLEBIH DAHULU
     if additional_info:
         metadata.update(additional_info)
     
     try:
         if "nodes" in ast_data:
-            # Cari kontrak utama berdasarkan prioritas
             main_contract = None
             contracts = []
             
-            # Kumpulkan semua kontrak definisi
             for node in ast_data["nodes"]:
                 if node.get("nodeType") == "ContractDefinition":
                     contracts.append(node)
             
             if contracts:
-                # Prioritas 1: Cari kontrak dengan nama yang sama dengan contract_name dari additional_info
                 if additional_info and additional_info.get("contract_name"):
                     target_name = additional_info["contract_name"]
                     for contract in contracts:
@@ -39,7 +34,6 @@ def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional
                             main_contract = contract
                             break
                 
-                # Prioritas 2: Ambil kontrak non-abstract terakhir (skip interface dan library)
                 if not main_contract:
                     for contract in reversed(contracts):
                         if (not contract.get("abstract", False) and 
@@ -47,23 +41,19 @@ def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional
                             main_contract = contract
                             break
                 
-                # Prioritas 3: Ambil kontrak terakhir apapun jenisnya (kecuali interface)
                 if not main_contract:
                     for contract in reversed(contracts):
                         if contract.get("contractKind") != "interface":
                             main_contract = contract
                             break
                 
-                # Prioritas 4: Ambil kontrak terakhir apapun
                 if not main_contract and contracts:
                     main_contract = contracts[-1]
                 
                 if main_contract:
-                    # Update name hanya jika belum ada
                     if not metadata.get("name"):
                         metadata["name"] = main_contract.get("name")
                     
-                    # Update contract_name hanya jika belum ada
                     if not metadata.get("contract_name"):
                         metadata["contract_name"] = main_contract.get("name")
                     
@@ -72,13 +62,11 @@ def extract_contract_metadata(ast_data: Dict[str, Any], content: str, additional
                             if "baseName" in base and "name" in base["baseName"]:
                                 metadata["inherits"].append(base["baseName"]["name"])
         
-        # Ekstrak versi pragma hanya jika belum ada
         if not metadata.get("version"):
             pragma_versions = extract_all_pragma_versions(content)
             if pragma_versions:
                 metadata["version"] = pragma_versions[0]
         
-        # Ekstrak license hanya jika belum ada
         if not metadata.get("license"):
             license_match = re.search(r'//\s*SPDX-License-Identifier:\s*([^\n\r]+)', content, re.IGNORECASE)
             if license_match:
