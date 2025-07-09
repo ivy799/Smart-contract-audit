@@ -303,6 +303,9 @@ def parse_ast(content: str, additional_metadata: Dict[str, Any] = None) -> Dict[
         
         contract_metadata = extract_contract_metadata(ast_data, content, metadata_info)
         
+        if "license" in ast_data:
+            del ast_data["license"]
+            
         return {
             "success": True,
             "ast": ast_data,

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from utils import ast_parser, etherscan
+from app.utils import ast_parser, etherscan
 import os
 import tempfile
 import uuid
