@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  analyzer-app:
+    # Build image dari Dockerfile di direktori saat ini
+    build: .
+    # Nama container yang akan dibuat
+    container_name: smart_contract_analyzer
+    # Memuat environment variables dari file .env
+    env_file:
+      - .env
+    # Memetakan port 8000 di host ke port 8000 di container
+    ports:
+      - "8000:8000"
+    # Restart container secara otomatis jika terjadi kegagalan
+    restart: unless-stopped
