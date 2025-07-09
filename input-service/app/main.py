@@ -35,6 +35,8 @@ async def upload_contract(file: UploadFile = File(...)):
         original_content = contents.decode('utf-8')
         
         additional_metadata = {
+            "token_address": None,  # Selalu null untuk upload
+            "contract_name": None,  # Akan diisi otomatis oleh parser
             "file_path": stored_path
         }
         
@@ -71,8 +73,9 @@ async def get_contract(address: str):
         print("DEBUG: Starting AST parsing...")
         
         additional_metadata = {
-            "token_address": address,
-            "contract_name": contract_data["contract_name"]
+            "token_address": address,  # Selalu ada untuk endpoint ini
+            "contract_name": contract_data["contract_name"],  # Dari Etherscan
+            "file_path": None  # Null untuk contract dari address
         }
         
         ast_result = ast_parser.parse_ast(contract_data["source_code"], additional_metadata)
