@@ -17,7 +17,7 @@ export default function Home() {
   const router = useRouter()
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-8 h-8 border border-muted rotate-45"></div>
         <div className="absolute top-32 right-20 w-6 h-6 bg-muted rounded-full"></div>
         <div className="absolute bottom-40 left-20 w-4 h-4 bg-muted"></div>
@@ -83,7 +83,7 @@ export default function Home() {
         </nav>
       </header>
 
-      <main id="home" className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-10 pt-16 mt-35">
+      <main id="home" className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35">
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight tracking-[-.02em]">
             Most Reliable Smart Contract Audit
@@ -111,7 +111,7 @@ export default function Home() {
         </div>
       </main>
 
-      <section id="about" className="w-full px-8 sm:px-20 py-16 pt-20 relative z-10 bg-muted/5">
+      <section id="about" className="w-full px-8 sm:px-20 py-16 pt-20 relative z-20 bg-muted/5">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">UNMARSHAL 2.0</p>
@@ -139,7 +139,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="w-full px-8 sm:px-20 py-16 relative z-10">
+      <section id="services" className="w-full px-8 sm:px-20 py-16 relative z-20">
         <div className="max-w-7xl mx-auto">
           {/* Services Hero */}
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
@@ -254,7 +254,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-10 py-4 mt-auto flex-shrink-0">
+      <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
           href="#"
