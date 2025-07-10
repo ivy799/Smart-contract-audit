@@ -10,8 +10,11 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
 import { Card, CardContent } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+
 
 export default function Home() {
+  const router = useRouter()
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
       <div className="absolute inset-0 overflow-hidden">
@@ -27,7 +30,7 @@ export default function Home() {
 
       <header className="fixed top-0 w-full px-8 sm:px-20 z-50 flex-shrink-0 bg-background/95 backdrop-blur-lg border-b border-border">
         <nav className="flex items-center justify-between max-w-7xl mx-auto h-16">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
             <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
               <span className="text-black font-bold text-lg">Z</span>
             </div>
@@ -62,7 +65,7 @@ export default function Home() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink
-                  href="#"
+                  href="#home"
                   className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
                 >
                   Pricing
@@ -96,6 +99,7 @@ export default function Home() {
               GET STARTED
             </Button>
             <Button
+              onClick={() => router.push("/analyze")}
               size="lg"
               variant="outline"
               className="rounded-full px-8 py-3 h-12 group transition-colors font-medium bg-transparent"
