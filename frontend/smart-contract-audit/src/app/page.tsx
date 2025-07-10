@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 
 
 export default function Home() {
@@ -76,9 +83,16 @@ export default function Home() {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
-              Sign In
-            </Button>
+            <SignedOut>
+              <SignInButton>
+                <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
+                  Sign In
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
         </nav>
       </header>

@@ -34,6 +34,13 @@ import {
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 
 interface AnalysisResult {
   metadata: {
@@ -320,9 +327,16 @@ export default function Home() {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
-              Sign In
-            </Button>
+            <SignedOut>
+              <SignInButton>
+                <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
+                  Sign In
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
         </nav>
       </header>
