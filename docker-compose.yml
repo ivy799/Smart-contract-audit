@@ -17,12 +17,13 @@ services:
 
   analysis-service:
     build:
-      context: ./analysis-service
+      context: ./smartcontract-analysis
     container_name: analysis-service
     env_file:
-      - ./analysis-service/.env
+      - ./smartcontract-analysis/.env
     ports:
       - "8001:8000"
     restart: unless-stopped
     volumes:
-      - ./analysis-service:/app
+      - ./smartcontract-analysis:/app
+
