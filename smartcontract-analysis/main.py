@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 from dotenv import load_dotenv
 load_dotenv()
 
-class AnalysisMetadata(BaseModel):
-    """Metadata tentang kontrak yang dianalisis."""
-    file_path: Optional[str] = Field(None, description="Path file dari kontrak yang dianalisis, jika tersedia.")
-    token_address: str = Field(..., description="Alamat token kontrak di blockchain.")
+# class AnalysisMetadata(BaseModel):
+#     """Metadata tentang kontrak yang dianalisis."""
+#     file_path: Optional[str] = Field(None, description="Path file dari kontrak yang dianalisis, jika tersedia.")
+#     token_address: str = Field(..., description="Alamat token kontrak di blockchain.")
 
 class AnalysisMetadata(BaseModel):
     """

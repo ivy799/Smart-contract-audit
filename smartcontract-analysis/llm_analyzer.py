@@ -106,6 +106,7 @@ async def _call_llm_api(prompt: str, timeout: int=180) -> Dict[str, Any]:
             "response_mime_type": "application/json",
             "temperature": 0.1,
             "topP": 0.95,
+            "maxOutputTokens": 8192,
         }
     }
     loop = asyncio.get_running_loop()
@@ -120,6 +121,7 @@ async def _call_llm_api(prompt: str, timeout: int=180) -> Dict[str, Any]:
         raise KeyError("Struktur respons LLM tidak valid: 'candidates' atau 'content' tidak ada.")
     
     result_text = response_json['candidates'][0]['content']['parts'][0]['text']
+    logger.info(f"Respons mentah dari LLM: {result_text}")
     return json.loads(result_text)
 
 async def run_analysis(full_input_json: Dict[str, Any]) -> LLMAnalysisResult:
@@ -149,16 +151,31 @@ async def generate_recommendations(static_findings: List[Dict[str, Any]]) -> LLM
         logger.info("Tidak ada temuan statis yang diberikan untuk rekomendasi.")
         return LLMRecommendationResult(recommendations=[], error="Tidak ada temuan statis yang diberikan.")
 
-    try:
-        static_findings_str = json.dumps(static_findings, indent=2)
+    logger.info(f"Memulai proses rekomendasi LLM untuk {len(static_findings)} temuan...")
+    all_recommendations = []
+    chunk_size = 5
+
+    for i in range(0, len(static_findings), chunk_size):
+        chunk = static_findings[i:(i + chunk_size)]
+        logger.info(f"Memproses kelompok {i//chunk_size + 1} ({len(chunk)} temuan)...")
+
+        static_findings_str = json.dumps(chunk, indent=2)
         prompt = RECOMMENDATION_SYSTEM_PROMPT.format(static_findings_str=static_findings_str)
+    
+        try:
+            recommendation_data = await _call_llm_api(prompt)
+            
+            validated_report = LLMRecommendationResult(**recommendation_data)
+            all_recommendations.extend(validated_report.recommendations)
+            
+            await asyncio.sleep(1) 
 
-        recommendation_data = await _call_llm_api(prompt)
+        except Exception as e:
+            logger.error(f"Gagal memproses kelompok {i//chunk_size + 1}: {e}")
+            continue
+    
+    logger.info(f"Total rekomendasi yang berhasil dibuat: {len(all_recommendations)}")
+    if not all_recommendations and static_findings:
+        return LLMRecommendationResult(recommendations=[], error="Semua kelompok gagal diproses.")
 
-        validated_report = LLMRecommendationResult(**recommendation_data)
-        logger.info("Rekomendasi LLM berhasil dan output telah divalidasi.")
-        return validated_report
-    except KeyError as e:
-        error_msg = f"Struktur respons rekomendasi tidak valid: {e}"
-        logger.error(error_msg, exc_info=True)
-        return LLMRecommendationResult(recommendations=[], error=error_msg)
+    return LLMRecommendationResult(recommendations=all_recommendations)

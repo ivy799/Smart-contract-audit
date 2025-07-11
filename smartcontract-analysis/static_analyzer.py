@@ -98,32 +98,63 @@ async def run_tool(command: List[str]) -> Tuple[Optional[dict], Optional[str]]:
     except json.JSONDecodeError:
         return None, f"Failed to parse JSON output. STDOUT: {stdout_str[:500]}... STDERR: {stderr_str}"
 
+async def _run_command(command: List[str]) -> Tuple[str, str, int]:
+    """Helper untuk menjalankan command dan menangkap output."""
+    process = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    
+    stdout_str = stdout.decode('utf-8', errors='ignore').strip()
+    stderr_str = stderr.decode('utf-8', errors='ignore').strip()
+    
+    return stdout_str, stderr_str, process.returncode
 
 async def run_slither(file_path: str, solc_version: str) -> StaticAnalysisOutput:
     """Menjalankan Slither dan memformat hasilnya."""
-    # Gunakan solc-select untuk memastikan versi compiler yang tepat
+    # 1. Coba instal versi solc yang dibutuhkan secara otomatis
+    logger.info(f"Memastikan solc versi {solc_version} terinstal...")
+    install_command = ["solc-select", "install", solc_version]
+    _, install_stderr, install_code = await _run_command(install_command)
+    
+    if install_code != 0:
+        error_msg = f"Gagal menginstal solc versi {solc_version}. Error: {install_stderr}"
+        logger.error(error_msg)
+        return StaticAnalysisOutput(tool_name="Slither", issues=[], error=error_msg)
+    logger.info(f"Solc versi {solc_version} berhasil diinstal atau sudah ada.")
+
+    # 2. Jalankan Slither menggunakan versi solc yang sudah dipastikan
     solc_args = "--allow-paths ."
-    command = [
+    slither_command = [
         "slither", file_path, 
         "--solc-solcs-select", solc_version, 
         "--json", "-",
         "--solc-args", solc_args
     ]
-    logger.info(f"Menjalankan Slither dengan perintah: {' '.join(command)}")
+    logger.info(f"Menjalankan Slither dengan perintah: {' '.join(slither_command)}")
     
-    # Menggunakan run_tool yang sudah diperbarui
-    output_json, stderr_output = await run_tool(command)
-    
-    # Jika run_tool mengembalikan error, langsung gunakan itu.
-    if not output_json:
-        error_msg = f"Slither execution failed. Details: {stderr_output}"
+    slither_stdout, slither_stderr, slither_code = await _run_command(slither_command)
+
+    # Penanganan error jika Slither gagal
+    if slither_code != 0 and not slither_stdout:
+        error_msg = f"Slither execution failed with code {slither_code}. STDERR: {slither_stderr}"
         logger.error(error_msg)
         return StaticAnalysisOutput(tool_name="Slither", issues=[], error=error_msg)
-        
-    # Jika Slither berhasil tapi melaporkan error internal
+
+    # Penanganan error jika output bukan JSON
+    try:
+        output_json = json.loads(slither_stdout)
+    except json.JSONDecodeError:
+        error_msg = f"Failed to parse JSON output from Slither. STDOUT: {slither_stdout[:500]}..."
+        logger.error(error_msg)
+        return StaticAnalysisOutput(tool_name="Slither", issues=[], error=error_msg)
+
+    # Penanganan error internal yang dilaporkan oleh Slither
     if not output_json.get("success"):
         internal_error = output_json.get("error", "Unknown Slither error.")
-        error_msg = f"Slither reported an internal error: {internal_error}. STDERR: {stderr_output or 'Empty'}"
+        error_msg = f"Slither reported an internal error: {internal_error}"
         logger.error(error_msg)
         return StaticAnalysisOutput(tool_name="Slither", issues=[], error=error_msg)
 
@@ -131,15 +162,14 @@ async def run_slither(file_path: str, solc_version: str) -> StaticAnalysisOutput
     logger.info(f"Slither selesai, menemukan {len(issues)} isu.")
     return StaticAnalysisOutput(tool_name="Slither", issues=issues)
 
-
-
 async def run_analysis(file_path: str, solc_version: str) -> StaticAnalysisOutput:
     """
     Fungsi utama untuk modul ini. Menjalankan semua tool statis
     dan menggabungkan hasilnya.
     """
     logger.info(f"Memulai semua analisis statis untuk versi solc: {solc_version}")
-    slither_task = run_slither(file_path, solc_version)
+    cleaned_version = solc_version.strip("^~=> ")
+    slither_task = run_slither(file_path, cleaned_version)
 
     results = await asyncio.gather(slither_task)
     
