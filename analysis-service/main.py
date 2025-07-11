@@ -13,7 +13,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import static_analyzer
 import llm_analyzer
 
-# konfigurasi logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -40,10 +39,9 @@ app = FastAPI(
     version="2.1.0"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://localhost:8001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,21 +68,16 @@ def fetch_source_code_from_etherscan(address: str) -> str:
 
         if data['status'] == '1' and data['result'][0]['SourceCode']:
             source_code = data['result'][0]['SourceCode']
-            # Etherscan terkadang membungkus source code dalam kurung kurawal ganda
             if source_code.startswith('{{') and source_code.endswith('}}'):
                 source_code = source_code[1:-1]
-                # Jika source code adalah struktur JSON (untuk multi-file), kita coba parse
                 try:
                     source_files = json.loads(source_code)
-                    # Gabungkan semua file menjadi satu string kode
-                    # Ini adalah penyederhanaan; idealnya, tool harus mendukung multi-file
                     combined_code = ""
                     for file_info in source_files.get('sources', {}).values():
                         combined_code += file_info.get('content', '') + "\n\n"
                     logger.info("Source code multi-file berhasil digabungkan.")
                     return combined_code
                 except json.JSONDecodeError:
-                    # Jika gagal parse, anggap sebagai satu file
                     pass
             
             logger.info("Source code berhasil diambil dari Etherscan.")
@@ -102,29 +95,17 @@ def fetch_source_code_from_etherscan(address: str) -> str:
 async def analyze_contract(
     input_data: Dict[str, Any] = Body(...)
 ):
-    """
-    Endpoint utama untuk analisis.
-    
-    Menerima JSON lengkap (seperti response_baru.json), lalu:
-    1.  Mengekstrak alamat token.
-    2.  Mengambil source code dari Etherscan.
-    3.  Menjalankan analisis statis dan LLM secara paralel.
-    4.  Mengembalikan laporan gabungan.
-    """
+
     token_address = None
     file_path = None
-    # 1. Ekstrak informasi dari input JSON
     try:
         token_address = input_data["contract_metadata"]["token_address"]
-        # Ambil versi solidity untuk digunakan oleh static analyzer
         solidity_version = input_data.get("contract_metadata", {}).get("solidity_version", "0.8.24").lstrip('^')
     except KeyError:
         raise HTTPException(status_code=400, detail="Input JSON tidak valid: 'contract_metadata.token_address' tidak ditemukan.")
 
-    # 2. Ambil source code
     source_code = fetch_source_code_from_etherscan(token_address)
 
-    # Simpan source code ke file temporer untuk analisis statis
     tmp_file_path = ""
     try:
         with tempfile.NamedTemporaryFile(mode="w", suffix=".sol", delete=False, encoding='utf-8') as tmp_file:
@@ -133,18 +114,15 @@ async def analyze_contract(
         
         logger.info(f"Source code disimpan sementara di: {tmp_file_path}")
 
-        # 3. Jalankan analisis secara paralel
         logger.info("Memulai analisis statis dan LLM secara paralel...")
         static_task = static_analyzer.run_analysis(tmp_file_path, solidity_version)
         llm_task = llm_analyzer.run_analysis(input_data)
 
-        # Tunggu kedua task selesai
         results = await asyncio.gather(static_task, llm_task, return_exceptions=True)
 
         static_report = results[0]
         llm_report = results[1]
 
-        # Handle jika ada task yang gagal
         if isinstance(static_report, Exception):
             logger.error(f"Analisis statis gagal: {static_report}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Analisis statis gagal: {str(static_report)}")
@@ -155,7 +133,6 @@ async def analyze_contract(
 
         logger.info("Kedua analisis berhasil diselesaikan.")
 
-        # 4. Gabungkan hasil dan kirim response
         return FinalResponse(
             metadata=AnalysisMetadata(file_path=file_path, token_address=token_address),
             static_analysis_report=static_report,
@@ -163,7 +140,6 @@ async def analyze_contract(
         )
 
     finally:
-        # Pastikan file temporer selalu dihapus
         if tmp_file_path and os.path.exists(tmp_file_path):
             os.remove(tmp_file_path)
             logger.info(f"File temporer {tmp_file_path} telah dihapus.")
@@ -173,4 +149,4 @@ def read_root():
     return {"status": "Analyzer service is running."}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

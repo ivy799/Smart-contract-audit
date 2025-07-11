@@ -31,7 +31,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -40,6 +40,7 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from '@clerk/nextjs'
 
 interface AnalysisResult {
@@ -71,13 +72,45 @@ interface AnalysisResult {
 }
 
 export default function Home() {
+  const { isSignedIn, isLoaded, user } = useUser()
   const [selectedOption, setSelectedOption] = useState<string>("Token")
   const [tokenAddress, setTokenAddress] = useState<string>("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
+  const [usageCount, setUsageCount] = useState<number>(0)
+  const [maxUsage] = useState<number>(5)
+  const [lastReset, setLastReset] = useState<string>("")
   const router = useRouter()
   const { toast } = useToast()
+
+  // Helper to get today's date string (YYYY-MM-DD)
+  const getToday = () => {
+    const now = new Date()
+    return now.toISOString().slice(0, 10)
+  }
+
+  // Check and reset usage count if a new day
+  useEffect(() => {
+    if (isSignedIn && user) {
+      const storageKey = `analysis_usage_${user.id}`
+      const dateKey = `analysis_usage_date_${user.id}`
+      const storedCount = localStorage.getItem(storageKey)
+      const storedDate = localStorage.getItem(dateKey)
+      const today = getToday()
+
+      if (storedDate !== today) {
+        // Reset usage for new day
+        localStorage.setItem(storageKey, "0")
+        localStorage.setItem(dateKey, today)
+        setUsageCount(0)
+        setLastReset(today)
+      } else {
+        setUsageCount(storedCount ? parseInt(storedCount) : 0)
+        setLastReset(storedDate || today)
+      }
+    }
+  }, [isSignedIn, user])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -141,6 +174,24 @@ export default function Home() {
   }
 
   const handleAnalyze = async () => {
+    if (!isSignedIn || !user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to analyze contracts",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (usageCount >= maxUsage) {
+      toast({
+        title: "Usage limit reached",
+        description: `You have reached the maximum limit of ${maxUsage} analyses for today. Please come back tomorrow or upgrade your plan for unlimited access.`,
+        variant: "destructive",
+      })
+      return
+    }
+
     if (selectedOption === "Token" && !tokenAddress.trim()) {
       toast({
         title: "Token address required",
@@ -160,7 +211,7 @@ export default function Home() {
     }
 
     setIsLoading(true)
-    
+
     try {
       let contractData
 
@@ -172,10 +223,19 @@ export default function Home() {
 
       const result = await analyzeContract(contractData)
       setAnalysisResult(result)
-      
+
+      // Increment usage count after successful analysis
+      const newUsageCount = usageCount + 1
+      setUsageCount(newUsageCount)
+      const storageKey = `analysis_usage_${user.id}`
+      const dateKey = `analysis_usage_date_${user.id}`
+      const today = getToday()
+      localStorage.setItem(storageKey, newUsageCount.toString())
+      localStorage.setItem(dateKey, today)
+
       toast({
         title: "Analysis completed",
-        description: "Smart contract analysis has been completed successfully",
+        description: `Smart contract analysis has been completed successfully. ${maxUsage - newUsageCount} analyses remaining for today.`,
       })
     } catch (error) {
       console.error('Analysis error:', error)
@@ -234,7 +294,7 @@ export default function Home() {
       color: "hsl(var(--destructive))",
     },
     Medium: {
-      label: "Medium", 
+      label: "Medium",
       color: "#f97316",
     },
     Low: {
@@ -264,6 +324,139 @@ export default function Home() {
       default:
         return <Badge variant="outline">{severity}</Badge>
     }
+  }
+
+  // Show loading while Clerk is initializing
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    )
+  }
+
+  // Show sign-in prompt if user is not authenticated
+  if (!isSignedIn) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-8 h-8 border border-muted rotate-45"></div>
+          <div className="absolute top-32 right-20 w-6 h-6 bg-muted rounded-full"></div>
+          <div className="absolute bottom-40 left-20 w-4 h-4 bg-muted"></div>
+          <div className="absolute top-60 left-1/4 w-3 h-3 bg-muted rotate-45"></div>
+          <div className="absolute bottom-60 right-1/4 w-5 h-5 border border-muted rounded-full"></div>
+          <div className="absolute top-40 right-1/3 w-2 h-2 bg-muted"></div>
+          <div className="absolute bottom-32 left-1/3 w-6 h-6 border border-muted"></div>
+          <div className="absolute top-80 right-10 w-4 h-4 bg-muted rotate-45"></div>
+        </div>
+
+        <header className="fixed top-0 w-full px-8 sm:px-20 z-50 flex-shrink-0 bg-background/95 backdrop-blur-lg border-b border-border">
+          <nav className="flex items-center justify-between max-w-7xl mx-auto h-16">
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
+              <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
+                <span className="text-black font-bold text-lg">Z</span>
+              </div>
+              <span className="text-xl font-semibold">Zectra</span>
+            </div>
+
+            <NavigationMenu className="hidden md:block">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    onClick={() => router.push("/")}
+                    className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
+                  >
+                    Home
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    onClick={() => router.push("/#about")}
+                    className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
+                  >
+                    About
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    onClick={() => router.push("/#services")}
+                    className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
+                  >
+                    Service
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    href="#"
+                    className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
+                  >
+                    Pricing
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <div className="flex items-center gap-4">
+              <ModeToggle />
+              <SignInButton>
+                <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
+                  Sign In
+                </Button>
+              </SignInButton>
+            </div>
+          </nav>
+        </header>
+
+        <div className="flex items-center justify-center min-h-screen relative z-20">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Authentication Required</CardTitle>
+              <CardDescription>
+                You need to sign in to access the smart contract analyzer.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <SignInButton>
+                <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold">
+                  Sign In to Continue
+                </Button>
+              </SignInButton>
+              <div className="text-center text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <SignUpButton>
+                  <button className="text-yellow-400 hover:underline">
+                    Sign up here
+                  </button>
+                </SignUpButton>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
+          <a
+            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+            href="#"
+          >
+            Learn
+          </a>
+          <a
+            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+            href="#"
+          >
+            Examples
+          </a>
+          <a
+            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+            href="#"
+          >
+            Term and Conditions
+          </a>
+        </footer>
+      </div>
+    )
   }
 
   return (
@@ -327,16 +520,7 @@ export default function Home() {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <SignedOut>
-              <SignInButton>
-                <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
-                  Sign In
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+            <UserButton afterSignOutUrl="/" />
           </div>
         </nav>
       </header>
@@ -347,7 +531,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Input</CardTitle>
               <CardDescription>
-                Enter your smart contract 
+                Enter your smart contract ({maxUsage - usageCount} analyses remaining for today)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -368,10 +552,10 @@ export default function Home() {
                   {selectedOption === "Token" && (
                     <div className="grid w-full items-center gap-3 mt-4">
                       <Label htmlFor="token">Token Address</Label>
-                      <Input 
-                        id="token" 
-                        type="text" 
-                        placeholder="0x..." 
+                      <Input
+                        id="token"
+                        type="text"
+                        placeholder="0x..."
                         value={tokenAddress}
                         onChange={(e) => setTokenAddress(e.target.value)}
                         disabled={isLoading}
@@ -399,9 +583,9 @@ export default function Home() {
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-2">
-              <Button 
+              <Button
                 onClick={handleAnalyze}
-                disabled={isLoading}
+                disabled={isLoading || usageCount >= maxUsage}
                 className="w-full"
               >
                 {isLoading ? (
@@ -409,10 +593,17 @@ export default function Home() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Analyzing...
                   </>
+                ) : usageCount >= maxUsage ? (
+                  "Usage Limit Reached"
                 ) : (
                   "Analyze Contract"
                 )}
               </Button>
+              {usageCount >= maxUsage && (
+                <p className="text-sm text-muted-foreground text-center">
+                  You've reached your daily analysis limit. It will reset tomorrow.
+                </p>
+              )}
             </CardFooter>
           </Card>
 
@@ -532,55 +723,55 @@ export default function Home() {
                                 <p className="text-sm leading-relaxed">{finding.description}</p>
                               </div>
                             </div>
-                            {index < analysisResult.llm_contextual_report!.findings.length - 1 && (
-                              <Separator className="my-4" />
-                            )}
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-muted-foreground">No contextual analysis findings</p>
+                      {index < analysisResult.llm_contextual_report!.findings.length - 1 && (
+                        <Separator className="my-4" />
                       )}
                     </div>
-                  </ScrollArea>
-                </div>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">No contextual analysis findings</p>
+                )}
               </div>
+            </ScrollArea>
+          </div>
+        </div>
 
-              {analysisResult.llm_contextual_report?.executive_summary && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-4">Executive Summary</h3>
-                  <Card>
-                    <CardContent className="p-4">
-                      <p className="text-sm leading-relaxed">{analysisResult.llm_contextual_report.executive_summary}</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </section>
-      )}
+        {analysisResult.llm_contextual_report?.executive_summary && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Executive Summary</h3>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm leading-relaxed">{analysisResult.llm_contextual_report.executive_summary}</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </section>
+)}
 
-      <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Term and Conditions
-        </a>
-      </footer>
-    </div>
+<footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
+  <a
+    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+    href="#"
+  >
+    Learn
+  </a>
+  <a
+    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+    href="#"
+  >
+    Examples
+  </a>
+  <a
+    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+    href="#"
+  >
+    Term and Conditions
+  </a>
+</footer>
+    </div >
   )
 }
 

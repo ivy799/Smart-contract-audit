@@ -1,0 +1,170 @@
+{
+  "success": true,
+  "ast": {
+    "absolutePath": "contract.sol",
+    "exportedSymbols": {
+      "Context": [
+        11
+      ],
+      "ERC20": [
+        500
+      ],
+      "IERC20": [
+        144
+      ],
+      "Ownable": [
+        93
+      ],
+      "Voltara": [
+        771
+      ]
+    },
+    "id": 772,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:0"
+      },
+      {
+        "abstract": true,
+        "baseContracts": [],
+        "canonicalName": "Context",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 11,
+        "linearizedBaseContracts": [
+          11
+        ],
+        "name": "Context",
+        "nameLocation": "97:7:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 9,
+              "nodeType": "Block",
+              "src": "174:36:0",
+              "statements": [
+                {
+                  "expression": {
+                    "expression": {
+                      "id": 6,
+                      "name": "msg",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": -15,
+                      "src": "192:3:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_magic_message",
+                        "typeString": "msg"
+                      }
+                    },
+                    "id": 7,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "memberLocation": "196:6:0",
+                    "memberName": "sender",
+                    "nodeType": "MemberAccess",
+                    "src": "192:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 5,
+                  "id": 8,
+                  "nodeType": "Return",
+                  "src": "185:17:0"
+                }
+              ]
+            },
+            "id": 10,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_msgSender",
+            "nameLocation": "121:10:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "131:2:0"
+            },
+            "returnParameters": {
+              "id": 5,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10,
+                  "src": "165:7:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "165:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "164:9:0"
+            },
+            "scope": 11,
+            "src": "112:98:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 772,
+        "src": "79:134:0",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:7165:0"
+  },
+  "warnings": [],
+  "removed_imports": [],
+  "contract_metadata": {
+    "name": "Voltara",
+    "version": "^0.8.20",
+    "license": "MIT",
+    "inherits": [
+      "ERC20",
+      "Ownable"
+    ],
+    "contract_name": "Voltara",
+    "solidity_version": "0.8.20",
+    "token_address": "0xf9CA7283933092bc9943fa0560aeAF0c46e81229",
+    "file_path": "etherscan/0xf9CA7283933092bc9943fa0560aeAF0c46e81229.sol"
+  }
+}

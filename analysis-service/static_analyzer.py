@@ -46,10 +46,8 @@ class StaticAnalysisOutput(BaseModel):
 def _map_slither_impact_to_severity(impact: str) -> Severity:
     """Helper untuk memetakan string impact dari Slither ke Enum Severity."""
     try:
-        # Mencoba mencocokkan langsung (misal: "High" -> Severity.HIGH)
         return Severity(impact.capitalize())
     except ValueError:
-        # Jika gagal, berarti nilai tidak ada di Enum, kembalikan UNKNOWN
         logger.warning(f"Nilai impact Slither tidak dikenal: '{impact}'. Ditetapkan sebagai UNKNOWN.")
         return Severity.UNKNOWN
 
@@ -97,7 +95,6 @@ def format_mythril_output(mythril_raw_json: dict) -> List[StaticIssue]:
             formatted_issues.append(new_issue)
     return formatted_issues
 
-# --- Core Functions untuk Menjalankan Tools ---
 
 async def run_tool(command: List[str]) -> Tuple[Optional[dict], Optional[str]]:
     """Helper untuk menjalankan command line tool secara asynchronous."""
@@ -122,7 +119,6 @@ async def run_tool(command: List[str]) -> Tuple[Optional[dict], Optional[str]]:
 
 async def run_slither(file_path: str, solc_version: str) -> StaticAnalysisOutput:
     """Menjalankan Slither dan memformat hasilnya."""
-    # Gunakan solc-select untuk memastikan versi compiler yang tepat
     solc_args = "--allow-paths ."
     command = [
         "slither", file_path, 
@@ -132,16 +128,13 @@ async def run_slither(file_path: str, solc_version: str) -> StaticAnalysisOutput
     ]
     logger.info(f"Menjalankan Slither dengan perintah: {' '.join(command)}")
     
-    # Menggunakan run_tool yang sudah diperbarui
     output_json, stderr_output = await run_tool(command)
     
-    # Jika run_tool mengembalikan error, langsung gunakan itu.
     if not output_json:
         error_msg = f"Slither execution failed. Details: {stderr_output}"
         logger.error(error_msg)
         return StaticAnalysisOutput(tool_name="Slither", issues=[], error=error_msg)
         
-    # Jika Slither berhasil tapi melaporkan error internal
     if not output_json.get("success"):
         internal_error = output_json.get("error", "Unknown Slither error.")
         error_msg = f"Slither reported an internal error: {internal_error}. STDERR: {stderr_output or 'Empty'}"
@@ -171,35 +164,8 @@ async def run_mythril(file_path: str, solc_version: str) -> StaticAnalysisOutput
 
 async def run_analysis(file_path: str, solc_version: str) -> StaticAnalysisOutput:
     """
-    Fungsi utama untuk modul ini. Menjalankan semua tool statis
-    dan menggabungkan hasilnya.
+    Fungsi utama untuk modul ini. Menjalankan hanya Slither.
     """
-    logger.info(f"Memulai semua analisis statis untuk versi solc: {solc_version}")
-    slither_task = run_slither(file_path, solc_version)
-    mythril_task = run_mythril(file_path, solc_version)
-
-    results = await asyncio.gather(slither_task, mythril_task)
-    
-    all_issues = []
-    all_errors = []
-    for res in results:
-        all_issues.extend(res.issues)
-        if res.error:
-            all_errors.append(f"[{res.tool_name}]: {res.error}")
-            
-    # De-duplikasi berdasarkan check, line, dan severity
-    unique_issues_map = {}
-    for issue in all_issues:
-        key = (issue.check, issue.line, issue.severity)
-        if key not in unique_issues_map:
-            unique_issues_map[key] = issue
-
-    unique_issues = list(unique_issues_map.values())
-    
-    logger.info(f"Total isu statis unik yang ditemukan: {len(unique_issues)}")
-    
-    return StaticAnalysisOutput(
-        tool_name="Static Analysis Suite",
-        issues=unique_issues,
-        error=" | ".join(all_errors) if all_errors else None
-    )
+    logger.info(f"Memulai analisis statis Slither untuk versi solc: {solc_version}")
+    slither_result = await run_slither(file_path, solc_version)
+    return slither_result

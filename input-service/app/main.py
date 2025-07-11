@@ -19,7 +19,6 @@ container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME
 
 app = FastAPI()
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -33,7 +32,6 @@ os.makedirs(TEMP_SOL_DIR, exist_ok=True)
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
-# Add Pydantic model for the address request
 class AddressRequest(BaseModel):
     address: str
 
