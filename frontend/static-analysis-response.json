@@ -1,0 +1,54 @@
+{
+  "tool_name": "Static Analysis Suite",
+  "issues": [
+    {
+      "check": "divide-before-multiply",
+      "severity": "Medium",
+      "line": 169,
+      "message": "Voltara._transfer(address,address,uint256) (../tmp/tmpi1s031bm.sol#169-188) performs a multiplication on the result of a division:\n\t- split = fee / 4 (../tmp/tmpi1s031bm.sol#177)\n\t- super._transfer(from,lightworkerPool,fee - (split * 3)) (../tmp/tmpi1s031bm.sol#183)"
+    },
+    {
+      "check": "missing-zero-check",
+      "severity": "Low",
+      "line": 161,
+      "message": "Voltara.updateLiquidityWallet(address).newAddr (../tmp/tmpi1s031bm.sol#161) lacks a zero-check on :\n\t\t- liquidityWallet = newAddr (../tmp/tmpi1s031bm.sol#162)"
+    },
+    {
+      "check": "missing-zero-check",
+      "severity": "Low",
+      "line": 157,
+      "message": "Voltara.updateEfurJacy(address).newAddr (../tmp/tmpi1s031bm.sol#157) lacks a zero-check on :\n\t\t- efurJacy = newAddr (../tmp/tmpi1s031bm.sol#158)"
+    },
+    {
+      "check": "missing-zero-check",
+      "severity": "Low",
+      "line": 165,
+      "message": "Voltara.updateLightworkerPool(address).newAddr (../tmp/tmpi1s031bm.sol#165) lacks a zero-check on :\n\t\t- lightworkerPool = newAddr (../tmp/tmpi1s031bm.sol#166)"
+    },
+    {
+      "check": "missing-zero-check",
+      "severity": "Low",
+      "line": 153,
+      "message": "Voltara.updateTreasury(address).newAddr (../tmp/tmpi1s031bm.sol#153) lacks a zero-check on :\n\t\t- voltaTreasury = newAddr (../tmp/tmpi1s031bm.sol#154)"
+    },
+    {
+      "check": "solc-version",
+      "severity": "Informational",
+      "line": -1,
+      "message": "Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)\n\t- VerbatimInvalidDeduplication\n\t- FullInlinerNonExpressionSplitArgumentEvaluationOrder\n\t- MissingSideEffectsOnSelectorAccess.\n It is used by:\n\t- ../tmp/tmpi1s031bm.sol#2"
+    },
+    {
+      "check": "too-many-digits",
+      "severity": "Informational",
+      "line": 143,
+      "message": "Voltara.constructor() (../tmp/tmpi1s031bm.sol#143-147) uses literals with too many digits:\n\t- total = 33330000000 * 10 ** decimals() (../tmp/tmpi1s031bm.sol#144)"
+    },
+    {
+      "check": "constable-states",
+      "severity": "Optimization",
+      "line": 137,
+      "message": "Voltara.taxPercent (../tmp/tmpi1s031bm.sol#137) should be constant"
+    }
+  ],
+  "error": null
+}

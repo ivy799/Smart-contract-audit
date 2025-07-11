@@ -1,13 +1,7 @@
-"""
-File: main.py
-File ini adalah file utama untuk menjalankan paralel processing antara analisis statis dan LLM (KAG) dan menyatukan hasill analisa tanpa duplikat.
-"""
-
-
 import uvicorn
 import os
 import json
-import asyncio
+from fastapi.middleware.cors import CORSMiddleware
 import tempfile
 import requests
 import logging
@@ -18,7 +12,6 @@ from typing import List, Dict, Any, Optional
 import static_analyzer
 import llm_analyzer
 
-# konfigurasi logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -45,6 +38,14 @@ app = FastAPI(
     title="Hybrid Smart Contract Analyzer",
     description="Menjalankan analisis statis (Slither, Mythril) dan analisis LLM (KAG) secara paralel menggunakan Docker.",
     version="3.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://localhost:8001"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 def fetch_source_code_from_etherscan(address: str) -> str:

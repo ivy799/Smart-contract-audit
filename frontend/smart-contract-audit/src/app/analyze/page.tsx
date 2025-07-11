@@ -55,20 +55,28 @@ interface AnalysisResult {
       severity: string;
       line: number;
       message: string;
-    }>,
+    }>;
     error?: string;
   };
   llm_contextual_report?: {
     executive_summary: string;
     overall_risk_grading: string;
+    risk_score?: number;
     findings: Array<{
       severity: string;
       category: string;
       description: string;
       confidence: number;
-    }>,
+    }>;
     error?: string;
   };
+  recommendations?: Array<{
+    original_check: string;
+    original_message: string;
+    line_number: number;
+    explanation: string;
+    recommended_code_snippet: string;
+  }>;
 }
 
 export default function Home() {
@@ -81,16 +89,17 @@ export default function Home() {
   const [usageCount, setUsageCount] = useState<number>(0)
   const [maxUsage] = useState<number>(5)
   const [lastReset, setLastReset] = useState<string>("")
+  const [analysisStep, setAnalysisStep] = useState<'idle' | 'static' | 'llm' | 'recommendations' | 'complete'>('idle')
+  const [staticAnalysisResult, setStaticAnalysisResult] = useState<any>(null)
+  const [llmAnalysisResult, setLlmAnalysisResult] = useState<any>(null)
   const router = useRouter()
   const { toast } = useToast()
 
-  // Helper to get today's date string (YYYY-MM-DD)
   const getToday = () => {
     const now = new Date()
     return now.toISOString().slice(0, 10)
   }
 
-  // Check and reset usage count if a new day
   useEffect(() => {
     if (isSignedIn && user) {
       const storageKey = `analysis_usage_${user.id}`
@@ -100,7 +109,6 @@ export default function Home() {
       const today = getToday()
 
       if (storedDate !== today) {
-        // Reset usage for new day
         localStorage.setItem(storageKey, "0")
         localStorage.setItem(dateKey, today)
         setUsageCount(0)
@@ -157,8 +165,8 @@ export default function Home() {
     return response.json()
   }
 
-  const analyzeContract = async (contractData: any) => {
-    const response = await fetch('http://localhost:8001/analyze', {
+  const performStaticAnalysis = async (contractData: any) => {
+    const response = await fetch('http://localhost:8001/static-analysis', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +175,39 @@ export default function Home() {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to analyze contract')
+      throw new Error('Failed to perform static analysis')
+    }
+
+    return response.json()
+  }
+
+  const performLlmAnalysis = async (contractData: any) => {
+    const response = await fetch('http://localhost:8001/llm-analysis', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contractData),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to perform LLM analysis')
+    }
+
+    return response.json()
+  }
+
+  const generateRecommendations = async (staticAnalysisData: any) => {
+    const response = await fetch('http://localhost:8001/generate-recommendations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(staticAnalysisData),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to generate recommendations')
     }
 
     return response.json()
@@ -211,7 +251,8 @@ export default function Home() {
     }
 
     setIsLoading(true)
-
+    setAnalysisStep('idle')
+    
     try {
       let contractData
 
@@ -221,10 +262,30 @@ export default function Home() {
         contractData = await uploadFile(selectedFile!)
       }
 
-      const result = await analyzeContract(contractData)
-      setAnalysisResult(result)
+      setAnalysisStep('static')
+      const staticResult = await performStaticAnalysis(contractData)
+      setStaticAnalysisResult(staticResult)
 
-      // Increment usage count after successful analysis
+      setAnalysisStep('llm')
+      const llmResult = await performLlmAnalysis(contractData)
+      setLlmAnalysisResult(llmResult)
+
+      setAnalysisStep('recommendations')
+      const recommendationsResult = await generateRecommendations(staticResult)
+
+      const combinedResult: AnalysisResult = {
+        metadata: contractData.metadata || {
+          token_address: selectedOption === "Token" ? tokenAddress : undefined,
+          file_path: selectedOption === "Upload" ? selectedFile?.name : undefined,
+        },
+        static_analysis_report: staticResult,
+        llm_contextual_report: llmResult,
+        recommendations: recommendationsResult.recommendations || [],
+      }
+
+      setAnalysisResult(combinedResult)
+      setAnalysisStep('complete')
+
       const newUsageCount = usageCount + 1
       setUsageCount(newUsageCount)
       const storageKey = `analysis_usage_${user.id}`
@@ -244,8 +305,24 @@ export default function Home() {
         description: error instanceof Error ? error.message : "An error occurred during analysis",
         variant: "destructive",
       })
+      setAnalysisStep('idle')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const getAnalysisStepText = () => {
+    switch (analysisStep) {
+      case 'static':
+        return 'Performing static analysis...'
+      case 'llm':
+        return 'Running LLM contextual analysis...'
+      case 'recommendations':
+        return 'Generating recommendations...'
+      case 'complete':
+        return 'Analysis complete!'
+      default:
+        return 'Analyzing...'
     }
   }
 
@@ -326,7 +403,6 @@ export default function Home() {
     }
   }
 
-  // Show loading while Clerk is initializing
   if (!isLoaded) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
@@ -337,7 +413,6 @@ export default function Home() {
     )
   }
 
-  // Show sign-in prompt if user is not authenticated
   if (!isSignedIn) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
@@ -591,7 +666,7 @@ export default function Home() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyzing...
+                    {getAnalysisStepText()}
                   </>
                 ) : usageCount >= maxUsage ? (
                   "Usage Limit Reached"
@@ -604,10 +679,22 @@ export default function Home() {
                   You've reached your daily analysis limit. It will reset tomorrow.
                 </p>
               )}
+              {isLoading && (
+                <div className="w-full bg-muted rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                    style={{
+                      width: analysisStep === 'static' ? '33%' : 
+                             analysisStep === 'llm' ? '66%' : 
+                             analysisStep === 'recommendations' ? '90%' : 
+                             analysisStep === 'complete' ? '100%' : '10%'
+                    }}
+                  />
+                </div>
+              )}
             </CardFooter>
           </Card>
 
-          {/* Chart Section */}
           <Card className="flex flex-col relative z-30">
             <CardHeader className="items-center pb-0">
               <CardTitle>Security Issues Distribution</CardTitle>
@@ -665,12 +752,17 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Overall Risk:</span>
                     {getSeverityBadge(analysisResult.llm_contextual_report.overall_risk_grading)}
+                    {analysisResult.llm_contextual_report.risk_score && (
+                      <span className="text-sm text-muted-foreground">
+                        ({analysisResult.llm_contextual_report.risk_score}/100)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 lg:grid-cols-3">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Static Analysis Issues</h3>
                   <ScrollArea className="h-80 w-full rounded-md border">
@@ -723,54 +815,92 @@ export default function Home() {
                                 <p className="text-sm leading-relaxed">{finding.description}</p>
                               </div>
                             </div>
-                      {index < analysisResult.llm_contextual_report!.findings.length - 1 && (
-                        <Separator className="my-4" />
+                            {index < analysisResult.llm_contextual_report!.findings.length - 1 && (
+                              <Separator className="my-4" />
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground">No contextual analysis findings</p>
                       )}
                     </div>
-                  ))
-                ) : (
-                  <p className="text-muted-foreground">No contextual analysis findings</p>
-                )}
+                  </ScrollArea>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Recommendations</h3>
+                  <ScrollArea className="h-80 w-full rounded-md border">
+                    <div className="p-4">
+                      {analysisResult.recommendations?.length ? (
+                        analysisResult.recommendations.map((rec, index) => (
+                          <div key={index}>
+                            <div className="flex justify-between items-start gap-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    {rec.original_check}
+                                  </Badge>
+                                  <span className="text-sm font-medium text-muted-foreground">
+                                    Line {rec.line_number > 0 ? rec.line_number : 'N/A'}
+                                  </span>
+                                </div>
+                                <p className="text-sm leading-relaxed mb-2">{rec.explanation}</p>
+                                <div className="bg-muted/50 rounded p-2 mt-2">
+                                  <p className="text-xs font-mono text-muted-foreground">Recommended fix:</p>
+                                  <pre className="text-xs mt-1 whitespace-pre-wrap break-words">
+                                    {rec.recommended_code_snippet}
+                                  </pre>
+                                </div>
+                              </div>
+                            </div>
+                            {index < analysisResult.recommendations!.length - 1 && (
+                              <Separator className="my-4" />
+                            )}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground">No recommendations available</p>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
               </div>
-            </ScrollArea>
-          </div>
-        </div>
 
-        {analysisResult.llm_contextual_report?.executive_summary && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-4">Executive Summary</h3>
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-sm leading-relaxed">{analysisResult.llm_contextual_report.executive_summary}</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  </section>
-)}
+              {analysisResult.llm_contextual_report?.executive_summary && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4">Executive Summary</h3>
+                  <Card>
+                    <CardContent className="p-4">
+                      <p className="text-sm leading-relaxed">{analysisResult.llm_contextual_report.executive_summary}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+      )}
 
-<footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
-  <a
-    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-    href="#"
-  >
-    Learn
-  </a>
-  <a
-    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-    href="#"
-  >
-    Examples
-  </a>
-  <a
-    className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-    href="#"
-  >
-    Term and Conditions
-  </a>
-</footer>
+      <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+          href="#"
+        >
+          Learn
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+          href="#"
+        >
+          Examples
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
+          href="#"
+        >
+          Term and Conditions
+        </a>
+      </footer>
     </div >
   )
 }

@@ -1,0 +1,61 @@
+{
+  "recommendations": [
+    {
+      "original_check": "divide-before-multiply",
+      "original_message": "Voltara._transfer(address,address,uint256) (../tmp/tmpi1s031bm.sol#169-188) performs a multiplication on the result of a division:\n\t- split = fee / 4 (../tmp/tmpi1s031bm.sol#177)\n\t- super._transfer(from,lightworkerPool,fee - (split * 3)) (../tmp/tmpi1s031bm.sol#183)",
+      "line_number": 177,
+      "explanation": "Multiplying before dividing prevents potential loss of precision due to integer truncation in the division.  The original code could result in an inaccurate fee calculation, especially with smaller values of `fee`. The solution uses multiplication first to maintain precision.",
+      "recommended_code_snippet": "uint256 split = (fee * 3) / 4;\nsuper._transfer(from, lightworkerPool, fee - split);"
+    },
+    {
+      "original_check": "missing-zero-check",
+      "original_message": "Voltara.updateLiquidityWallet(address).newAddr (../tmp/tmpi1s031bm.sol#161) lacks a zero-check on :\n\t\t- liquidityWallet = newAddr (../tmp/tmpi1s031bm.sol#162)",
+      "line_number": 162,
+      "explanation": "Failing to check for a zero address before assigning it to `liquidityWallet` can lead to unexpected behavior or vulnerabilities later in the contract.  The zero address typically represents a non-existent account, and using it might cause functions to fail silently or produce incorrect results.",
+      "recommended_code_snippet": "require(newAddr != address(0), \"Liquidity wallet cannot be the zero address\");\nliquidityWallet = newAddr;"
+    },
+    {
+      "original_check": "missing-zero-check",
+      "original_message": "Voltara.updateEfurJacy(address).newAddr (../tmp/tmpi1s031bm.sol#157) lacks a zero-check on :\n\t\t- efurJacy = newAddr (../tmp/tmpi1s031bm.sol#158)",
+      "line_number": 158,
+      "explanation": "Similar to the previous issue, not checking for the zero address before assigning it to `efurJacy` can lead to errors or vulnerabilities.  The zero address should be explicitly disallowed to prevent unexpected behavior.",
+      "recommended_code_snippet": "require(newAddr != address(0), \"EfurJacy address cannot be zero\");\nefurJacy = newAddr;"
+    },
+    {
+      "original_check": "missing-zero-check",
+      "original_message": "Voltara.updateLightworkerPool(address).newAddr (../tmp/tmpi1s031bm.sol#165) lacks a zero-check on :\n\t\t- lightworkerPool = newAddr (../tmp/tmpi1s031bm.sol#166)",
+      "line_number": 166,
+      "explanation": "Assigning the zero address to `lightworkerPool` without a check can cause issues.  This check ensures that a valid address is always used.",
+      "recommended_code_snippet": "require(newAddr != address(0), \"Lightworker pool address cannot be zero\");\nlightworkerPool = newAddr;"
+    },
+    {
+      "original_check": "missing-zero-check",
+      "original_message": "Voltara.updateTreasury(address).newAddr (../tmp/tmpi1s031bm.sol#153) lacks a zero-check on :\n\t\t- voltaTreasury = newAddr (../tmp/tmpi1s031bm.sol#154)",
+      "line_number": 154,
+      "explanation": "The zero address should not be used for the treasury. This check prevents accidental assignment of an invalid address.",
+      "recommended_code_snippet": "require(newAddr != address(0), \"Treasury address cannot be zero\");\nvoltaTreasury = newAddr;"
+    },
+    {
+      "original_check": "solc-version",
+      "original_message": "Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)\n\t- VerbatimInvalidDeduplication\n\t- FullInlinerNonExpressionSplitArgumentEvaluationOrder\n\t- MissingSideEffectsOnSelectorAccess.\n It is used by:\n\t- ../tmp/tmpi1s031bm.sol#2",
+      "line_number": -1,
+      "explanation": "The specified Solidity compiler version has known critical bugs.  Updating to a newer, patched version is crucial to mitigate these risks.",
+      "recommended_code_snippet": "Update the Solidity compiler version to a more recent release that addresses the mentioned vulnerabilities.  Check the Solidity release notes for the latest stable version."
+    },
+    {
+      "original_check": "too-many-digits",
+      "original_message": "Voltara.constructor() (../tmp/tmpi1s031bm.sol#143-147) uses literals with too many digits:\n\t- total = 33330000000 * 10 ** decimals() (../tmp/tmpi1s031bm.sol#144)",
+      "line_number": 144,
+      "explanation": "Using literals with excessive digits can lead to potential issues with precision and readability.  It's best practice to use a more concise and manageable representation, potentially using scientific notation or constants.",
+      "recommended_code_snippet": "uint256 constant TOTAL_SUPPLY = 33330000000 ether; // Use ether for clarity\ntotal = TOTAL_SUPPLY * (10**decimals());"
+    },
+    {
+      "original_check": "constable-states",
+      "original_message": "Voltara.taxPercent (../tmp/tmpi1s031bm.sol#137) should be constant",
+      "line_number": 137,
+      "explanation": "Declaring `taxPercent` as constant improves gas efficiency and prevents accidental modification of this value after contract deployment.  Since the tax percentage is likely fixed, making it constant is a good optimization.",
+      "recommended_code_snippet": "uint256 public constant taxPercent = 5; // Example value"
+    }
+  ],
+  "error": null
+}
