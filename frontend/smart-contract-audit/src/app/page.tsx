@@ -2,22 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Database, Zap, Users, Cloud } from "lucide-react"
-import { ModeToggle } from "@/components/toggle";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
-import {
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
+
+import Navbar from "./components/Navbar";
 
 
 export default function Home() {
@@ -35,67 +23,7 @@ export default function Home() {
         <div className="absolute top-80 right-10 w-4 h-4 bg-muted rotate-45"></div>
       </div>
 
-      <header className="fixed top-0 w-full px-8 sm:px-20 z-50 flex-shrink-0 bg-background/95 backdrop-blur-lg border-b border-border">
-        <nav className="flex items-center justify-between max-w-7xl mx-auto h-16">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push("/")}>
-            <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-lg">Z</span>
-            </div>
-            <span className="text-xl font-semibold">Zectra</span>
-          </div>
-
-          <NavigationMenu className="hidden md:block">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  href="#home"
-                  className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
-                >
-                  Home
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  href="#about"
-                  className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
-                >
-                  About
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  href="#services"
-                  className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
-                >
-                  Service
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  href="#home"
-                  className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium"
-                >
-                  Pricing
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          <div className="flex items-center gap-4">
-            <ModeToggle />
-            <SignedOut>
-              <SignInButton>
-                <Button variant="outline" className="font-medium text-sm h-10 px-4 bg-transparent">
-                  Sign In
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-          </div>
-        </nav>
-      </header>
+      <Navbar/>
 
       <main id="home" className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35">
         <div className="max-w-4xl mx-auto space-y-8">
