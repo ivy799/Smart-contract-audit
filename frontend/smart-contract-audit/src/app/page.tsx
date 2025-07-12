@@ -1,44 +1,39 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Database, Zap, Users, Cloud } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Database, Zap, Users, Cloud } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 import Navbar from "./components/Navbar";
-
-
+import Footer from "./components/Footer";
+import { AnimatedGridPatternDemo } from "./components/GridPattern";
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-8 h-8 border border-muted rotate-45"></div>
-        <div className="absolute top-32 right-20 w-6 h-6 bg-muted rounded-full"></div>
-        <div className="absolute bottom-40 left-20 w-4 h-4 bg-muted"></div>
-        <div className="absolute top-60 left-1/4 w-3 h-3 bg-muted rotate-45"></div>
-        <div className="absolute bottom-60 right-1/4 w-5 h-5 border border-muted rounded-full"></div>
-        <div className="absolute top-40 right-1/3 w-2 h-2 bg-muted"></div>
-        <div className="absolute bottom-32 left-1/3 w-6 h-6 border border-muted"></div>
-        <div className="absolute top-80 right-10 w-4 h-4 bg-muted rotate-45"></div>
-      </div>
+      <AnimatedGridPatternDemo/>
 
-      <Navbar/>
+      <Navbar />
 
-      <main id="home" className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35">
+      <main
+        id="home"
+        className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35"
+      >
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight tracking-[-.02em]">
-            Most Reliable Smart Contract Audit
+            Audit Smart Contract Paling Terpercaya
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Instant Smart Contract Audit with AI - Fast, Reliable and Comprehensive across Multiple Blockchain Networks.
+            Audit Smart Contract Instan dengan AI - Cepat, Handal dan
+            Menyeluruh untuk Berbagai Jaringan Blockchain.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
               size="lg"
               className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 h-12 transition-colors"
             >
-              GET STARTED
+              MULAI SEKARANG
             </Button>
             <Button
               onClick={() => router.push("/analyze")}
@@ -46,34 +41,45 @@ export default function Home() {
               variant="outline"
               className="rounded-full px-8 py-3 h-12 group transition-colors font-medium bg-transparent"
             >
-              TRY FOR FREE
+              COBA GRATIS
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
       </main>
 
-      <section id="about" className="w-full px-8 sm:px-20 py-16 pt-20 relative z-20 bg-muted/5">
+      <section
+        id="about"
+        className="w-full px-8 sm:px-20 py-16 pt-20 relative z-20 bg-muted/5"
+      >
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-4">
-            <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">UNMARSHAL 2.0</p>
-            <h2 className="text-2xl font-semibold text-foreground">Smart Contract Audit and AI Integration</h2>
+            <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">
+              UNMARSHAL 2.0
+            </p>
+            <h2 className="text-2xl font-semibold text-foreground">
+              Audit Smart Contract dan Integrasi AI
+            </h2>
           </div>
           <div className="space-y-6">
             <p className="text-lg sm:text-xl leading-relaxed text-foreground max-w-3xl mx-auto">
-              <strong>Zectra</strong> is <span className="inline-flex items-center gap-1">🧠🔐</span> redefining smart
-              contract audits by fusing large language models and blockchain technology.{" "}
-              <span className="inline-flex items-center gap-1">⚙️📜</span> Our platform leverages the power of AI to
-              deeply understand, analyze, and secure smart contracts with unprecedented precision.{" "}
-              <span className="inline-flex items-center gap-1">🚀</span> We aim to simplify and scale contract auditing,
-              making Web3 safer and smarter for everyone.
+              <strong>Zectra</strong> sedang{" "}
+              <span className="inline-flex items-center gap-1">🧠🔐</span>{" "}
+              mengubah cara audit smart contract dengan menggabungkan teknologi AI
+              dan blockchain.{" "}
+              <span className="inline-flex items-center gap-1">⚙️📜</span> Platform
+              kami memanfaatkan kekuatan AI untuk memahami, menganalisis,
+              dan mengamankan smart contract dengan tingkat akurasi yang luar biasa.{" "}
+              <span className="inline-flex items-center gap-1">🚀</span> Kami bertujuan
+              menyederhanakan dan meningkatkan skala audit kontrak, membuat Web3
+              lebih aman dan cerdas untuk semua orang.
             </p>
             <div className="pt-4">
               <Button
                 variant="outline"
                 className="rounded-full px-6 py-2 h-10 group transition-colors font-medium text-sm bg-transparent"
               >
-                LEARN MORE ABOUT UNMARSHAL 2.0
+                PELAJARI LEBIH LANJUT TENTANG UNMARSHAL 2.0
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
@@ -81,21 +87,25 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="services" className="w-full px-8 sm:px-20 py-16 relative z-20">
+      <section
+        id="services"
+        className="w-full px-8 sm:px-20 py-16 relative z-20"
+      >
         <div className="max-w-7xl mx-auto">
           {/* Services Hero */}
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div className="space-y-6">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                Your Gateway to Advanced Blockchain Data Indexing
+                Gateway Anda untuk Indexing Data Blockchain Tingkat Lanjut
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Experience the power of the Unmarshal Network, where blockchain indexing meets decentralization. Our
-                Proof of Staked Authority model empowers community members to run indexers, enhancing reliability and
-                trust.
+                Rasakan kekuatan Unmarshal Network, di mana indexing blockchain
+                bertemu dengan desentralisasi. Model Proof of Staked Authority kami
+                memberdayakan anggota komunitas untuk menjalankan indexer,
+                meningkatkan keandalan dan kepercayaan.
               </p>
               <Button className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 h-10 group transition-colors">
-                EXPLORE
+                JELAJAHI
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
@@ -123,7 +133,9 @@ export default function Home() {
 
                 {/* Dashboard mockup */}
                 <div className="absolute bottom-4 right-4 bg-card border rounded-lg p-4 shadow-lg">
-                  <div className="text-sm text-muted-foreground mb-1">0x437...59f1</div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    0x437...59f1
+                  </div>
                   <div className="text-2xl font-bold">$4,546</div>
                   <div className="flex gap-2 mt-2">
                     <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
@@ -145,10 +157,10 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Database className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Deep Indexing</h3>
+                <h3 className="text-lg font-semibold">Indexing Mendalam</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  We're best in class data decoders extract rich information & synthesises on-chain & off-chain data to
-                  get contextual meaning.
+                  Decoder data terbaik di kelasnya mengekstrak informasi kaya &
+                  mensintesis data on-chain & off-chain untuk mendapatkan makna kontekstual.
                 </p>
               </CardContent>
             </Card>
@@ -158,10 +170,10 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Rich API suite</h3>
+                <h3 className="text-lg font-semibold">Rangkaian API Lengkap</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer tracks every single data bit that flows into blockchain and helps retrieve it
-                  easily. Token balances etc.
+                  Unmarshal Indexer melacak setiap bit data yang masuk ke
+                  blockchain dan membantu mengambilnya dengan mudah. Saldo token, dll.
                 </p>
               </CardContent>
             </Card>
@@ -171,10 +183,10 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Customer centric</h3>
+                <h3 className="text-lg font-semibold">Berpusat pada Pelanggan</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  We offer 24X7 support assistance and dedicated channels for enterprise clients with flexible pricing
-                  plans.
+                  Kami menawarkan bantuan support 24/7 dan channel khusus untuk
+                  klien enterprise dengan paket harga yang fleksibel.
                 </p>
               </CardContent>
             </Card>
@@ -184,10 +196,10 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Cloud className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">True saas</h3>
+                <h3 className="text-lg font-semibold">SaaS Sejati</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer tracks every single data bit that flows into blockchain and helps retrieve it
-                  easily.
+                  Unmarshal Indexer melacak setiap bit data yang masuk ke
+                  blockchain dan membantu mengambilnya dengan mudah.
                 </p>
               </CardContent>
             </Card>
@@ -195,27 +207,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-          href="#"
-        >
-          Term and Conditions
-        </a>
-      </footer>
+      <Footer />
     </div>
-  )
+  );
 }
