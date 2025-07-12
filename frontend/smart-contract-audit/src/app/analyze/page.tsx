@@ -1,13 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/toggle";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
 import {
   Select,
   SelectContent,
@@ -30,115 +23,43 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  AlertCircleIcon,
-  InfoIcon,
-  AlertTriangleIcon,
-  TrendingUp,
-  Loader2,
-} from "lucide-react";
+import { TrendingUp, Loader2 } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
   SignInButton,
   SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
   useUser,
 } from "@clerk/nextjs";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Background from "../components/Background";
-
-interface AnalysisResult {
-  metadata: {
-    token_address?: string;
-    file_path?: string;
-  };
-  static_analysis_report?: {
-    tool_name: string;
-    issues: Array<{
-      check: string;
-      severity: string;
-      line: number;
-      message: string;
-    }>;
-    error?: string;
-  };
-  llm_contextual_report?: {
-    executive_summary: string;
-    overall_risk_grading: string;
-    risk_score?: number;
-    findings: Array<{
-      severity: string;
-      category: string;
-      description: string;
-      confidence: number;
-    }>;
-    error?: string;
-  };
-  recommendations?: Array<{
-    original_check: string;
-    original_message: string;
-    line_number: number;
-    explanation: string;
-    recommended_code_snippet: string;
-  }>;
-}
+import { AnalysisResult } from "@/types/analysis";
+import { getSeverityBadge } from "@/components/ui/SeverityBadge";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { useAnalysis } from "@/hooks/useAnalysis";
+import { getSeverityCounts, createChartData, getAnalysisStepText } from "@/utils/analysisUtils";
+import { chartConfig } from "@/config/chartConfig";
 
 export default function Home() {
-  const { isSignedIn, isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const [selectedOption, setSelectedOption] = useState<string>("Token");
   const [tokenAddress, setTokenAddress] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-    null
-  );
-  const [usageCount, setUsageCount] = useState<number>(0);
   const [maxUsage] = useState<number>(5);
-  const [lastReset, setLastReset] = useState<string>("");
-  const [analysisStep, setAnalysisStep] = useState<
-    "idle" | "static" | "llm" | "recommendations" | "complete"
-  >("idle");
-  const [staticAnalysisResult, setStaticAnalysisResult] = useState<any>(null);
-  const [llmAnalysisResult, setLlmAnalysisResult] = useState<any>(null);
   const router = useRouter();
   const { toast } = useToast();
 
-  const getToday = () => {
-    const now = new Date();
-    return now.toISOString().slice(0, 10);
-  };
-
-  useEffect(() => {
-    if (isSignedIn && user) {
-      const storageKey = `analysis_usage_${user.id}`;
-      const dateKey = `analysis_usage_date_${user.id}`;
-      const storedCount = localStorage.getItem(storageKey);
-      const storedDate = localStorage.getItem(dateKey);
-      const today = getToday();
-
-      if (storedDate !== today) {
-        localStorage.setItem(storageKey, "0");
-        localStorage.setItem(dateKey, today);
-        setUsageCount(0);
-        setLastReset(today);
-      } else {
-        setUsageCount(storedCount ? parseInt(storedCount) : 0);
-        setLastReset(storedDate || today);
-      }
-    }
-  }, [isSignedIn, user]);
+  // hooks
+  const { usageCount, incrementUsage, hasReachedLimit, remainingUsage } = useUsageTracking(maxUsage);
+  const { isLoading, analysisResult, analysisStep, performAnalysis } = useAnalysis();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -153,322 +74,21 @@ export default function Home() {
     }
   };
 
-  const uploadFile = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("http://localhost:8000/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to upload file");
-    }
-
-    return response.json();
-  };
-
-  const getContractFromAddress = async (address: string) => {
-    const response = await fetch(
-      "http://localhost:8000/contract-from-address",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ address }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch contract from address");
-    }
-
-    return response.json();
-  };
-
-  const performStaticAnalysis = async (contractData: any) => {
-    const response = await fetch("http://localhost:8001/static-analysis", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contractData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to perform static analysis");
-    }
-
-    return response.json();
-  };
-
-  const performLlmAnalysis = async (contractData: any) => {
-    const response = await fetch("http://localhost:8001/llm-analysis", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contractData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to perform LLM analysis");
-    }
-
-    return response.json();
-  };
-
-  const generateRecommendations = async (staticAnalysisData: any) => {
-    const response = await fetch(
-      "http://localhost:8001/generate-recommendations",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(staticAnalysisData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to generate recommendations");
-    }
-
-    return response.json();
-  };
-
+  // dari useAnalysis.ts
   const handleAnalyze = async () => {
-    if (!isSignedIn || !user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to analyze contracts",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (usageCount >= maxUsage) {
-      toast({
-        title: "Usage limit reached",
-        description: `You have reached the maximum limit of ${maxUsage} analyses for today. Please come back tomorrow or upgrade your plan for unlimited access.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedOption === "Token" && !tokenAddress.trim()) {
-      toast({
-        title: "Token address required",
-        description: "Please enter a token address",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedOption === "Upload" && !selectedFile) {
-      toast({
-        title: "File required",
-        description: "Please select a .sol file",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setAnalysisStep("idle");
-
-    try {
-      let contractData;
-
-      if (selectedOption === "Token") {
-        contractData = await getContractFromAddress(tokenAddress);
-      } else {
-        contractData = await uploadFile(selectedFile!);
-      }
-
-      setAnalysisStep("static");
-      const staticResult = await performStaticAnalysis(contractData);
-      setStaticAnalysisResult(staticResult);
-
-      setAnalysisStep("llm");
-      const llmResult = await performLlmAnalysis(contractData);
-      setLlmAnalysisResult(llmResult);
-
-      setAnalysisStep("recommendations");
-      const recommendationsResult = await generateRecommendations(staticResult);
-
-      const combinedResult: AnalysisResult = {
-        metadata: contractData.metadata || {
-          token_address: selectedOption === "Token" ? tokenAddress : undefined,
-          file_path:
-            selectedOption === "Upload" ? selectedFile?.name : undefined,
-        },
-        static_analysis_report: staticResult,
-        llm_contextual_report: llmResult,
-        recommendations: recommendationsResult.recommendations || [],
-      };
-
-      setAnalysisResult(combinedResult);
-      setAnalysisStep("complete");
-
-      const newUsageCount = usageCount + 1;
-      setUsageCount(newUsageCount);
-      const storageKey = `analysis_usage_${user.id}`;
-      const dateKey = `analysis_usage_date_${user.id}`;
-      const today = getToday();
-      localStorage.setItem(storageKey, newUsageCount.toString());
-      localStorage.setItem(dateKey, today);
-
-      toast({
-        title: "Analysis completed",
-        description: `Smart contract analysis has been completed successfully. ${
-          maxUsage - newUsageCount
-        } analyses remaining for today.`,
-      });
-    } catch (error) {
-      console.error("Analysis error:", error);
-      toast({
-        title: "Analysis failed",
-        description:
-          error instanceof Error
-            ? error.message
-            : "An error occurred during analysis",
-        variant: "destructive",
-      });
-      setAnalysisStep("idle");
-    } finally {
-      setIsLoading(false);
-    }
+    await performAnalysis(
+      selectedOption,
+      tokenAddress,
+      selectedFile,
+      usageCount,
+      maxUsage,
+      incrementUsage
+    );
   };
 
-  const getAnalysisStepText = () => {
-    switch (analysisStep) {
-      case "static":
-        return "Performing static analysis...";
-      case "llm":
-        return "Running LLM contextual analysis...";
-      case "recommendations":
-        return "Generating recommendations...";
-      case "complete":
-        return "Analysis complete!";
-      default:
-        return "Analyzing...";
-    }
-  };
-
-  const getSeverityCounts = () => {
-    if (!analysisResult)
-      return { high: 0, medium: 0, low: 0, informational: 0 };
-
-    const counts = { high: 0, medium: 0, low: 0, informational: 0 };
-
-    if (analysisResult.static_analysis_report?.issues) {
-      analysisResult.static_analysis_report.issues.forEach((issue) => {
-        const severity = issue.severity.toLowerCase();
-        if (severity === "informational") counts.informational++;
-        else if (severity === "low") counts.low++;
-        else if (severity === "medium") counts.medium++;
-        else if (severity === "high") counts.high++;
-      });
-    }
-
-    if (analysisResult.llm_contextual_report?.findings) {
-      analysisResult.llm_contextual_report.findings.forEach((finding) => {
-        const severity = finding.severity.toLowerCase();
-        if (severity === "tinggi" || severity === "high") counts.high++;
-        else if (severity === "sedang" || severity === "medium")
-          counts.medium++;
-        else if (severity === "rendah" || severity === "low") counts.low++;
-        else if (severity === "informational" || severity === "informasional")
-          counts.informational++;
-      });
-    }
-
-    return counts;
-  };
-
-  const severityCounts = getSeverityCounts();
-  const chartData = [
-    {
-      severity: "High",
-      count: severityCounts.high,
-      fill: "hsl(var(--destructive))",
-    },
-    { severity: "Medium", count: severityCounts.medium, fill: "#f97316" },
-    {
-      severity: "Low",
-      count: severityCounts.low,
-      fill: "hsl(var(--secondary))",
-    },
-    {
-      severity: "Informational",
-      count: severityCounts.informational,
-      fill: "hsl(var(--muted))",
-    },
-  ].filter((item) => item.count > 0);
-
-  const chartConfig = {
-    count: {
-      label: "Issues",
-    },
-    High: {
-      label: "High",
-      color: "hsl(var(--destructive))",
-    },
-    Medium: {
-      label: "Medium",
-      color: "#f97316",
-    },
-    Low: {
-      label: "Low",
-      color: "hsl(var(--secondary))",
-    },
-    Informational: {
-      label: "Informational",
-      color: "hsl(var(--muted))",
-    },
-  } satisfies ChartConfig;
-
-  const getSeverityBadge = (severity: string) => {
-    switch (severity.toLowerCase()) {
-      case "tinggi":
-      case "high":
-        return (
-          <Badge variant="destructive" className="flex items-center gap-1">
-            <AlertCircleIcon className="w-3 h-3" />
-            {severity}
-          </Badge>
-        );
-      case "sedang":
-      case "medium":
-        return (
-          <Badge className="bg-orange-500 text-white flex items-center gap-1">
-            <AlertTriangleIcon className="w-3 h-3" />
-            {severity}
-          </Badge>
-        );
-      case "rendah":
-      case "low":
-        return (
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <InfoIcon className="w-3 h-3" />
-            {severity}
-          </Badge>
-        );
-      case "informational":
-      case "informasional":
-        return (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <InfoIcon className="w-3 h-3" />
-            {severity}
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{severity}</Badge>;
-    }
-  };
+  // dari analysisUtils.ts
+  const severityCounts = getSeverityCounts(analysisResult);
+  const chartData = createChartData(severityCounts);
 
   if (!isLoaded) {
     return (
@@ -550,7 +170,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Input</CardTitle>
               <CardDescription>
-                Enter your smart contract ({maxUsage - usageCount} analyses
+                Enter your smart contract ({remainingUsage} analyses
                 remaining for today)
               </CardDescription>
             </CardHeader>
@@ -608,21 +228,21 @@ export default function Home() {
             <CardFooter className="flex-col gap-2">
               <Button
                 onClick={handleAnalyze}
-                disabled={isLoading || usageCount >= maxUsage}
+                disabled={isLoading || hasReachedLimit}
                 className="w-full"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {getAnalysisStepText()}
+                    {getAnalysisStepText(analysisStep)}
                   </>
-                ) : usageCount >= maxUsage ? (
+                ) : hasReachedLimit ? (
                   "Usage Limit Reached"
                 ) : (
                   "Analyze Contract"
                 )}
               </Button>
-              {usageCount >= maxUsage && (
+              {hasReachedLimit && (
                 <p className="text-sm text-muted-foreground text-center">
                   You've reached your daily analysis limit. It will reset
                   tomorrow.
