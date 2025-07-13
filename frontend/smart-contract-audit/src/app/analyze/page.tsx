@@ -105,7 +105,7 @@ export default function Home() {
       <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
         <Background />
 
-        <Footer />
+        <Navbar />
 
         <div className="flex items-center justify-center min-h-screen relative z-20">
           <Card className="w-full max-w-md mx-4">
@@ -135,26 +135,7 @@ export default function Home() {
           </Card>
         </div>
 
-        <footer className="flex gap-6 flex-wrap items-center justify-center text-sm relative z-20 py-4 mt-auto flex-shrink-0">
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-            href="#"
-          >
-            Learn
-          </a>
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-            href="#"
-          >
-            Examples
-          </a>
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4 text-muted-foreground hover:text-foreground transition-colors"
-            href="#"
-          >
-            Term and Conditions
-          </a>
-        </footer>
+        <Footer />
       </div>
     );
   }
