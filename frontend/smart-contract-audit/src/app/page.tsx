@@ -9,11 +9,13 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { AnimatedGridPatternDemo } from "./components/GridPattern";
 import { SpinningText } from "@/components/magicui/spinning-text";
+import { TextReveal } from "@/components/magicui/text-reveal";
 export default function Home() {
   const router = useRouter();
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground relative overflow-hidden font-[family-name:var(--font-geist-sans)]">
-      <AnimatedGridPatternDemo/>
+    <div className="flex flex-col min-h-screen bg-background text-foreground relative font-[family-name:var(--font-geist-sans)]">
+
+      <AnimatedGridPatternDemo />
 
       <Navbar />
 
@@ -26,8 +28,8 @@ export default function Home() {
             Audit Smart Contract Paling Terpercaya
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Audit Smart Contract Instan dengan AI - Cepat, Handal dan
-            Menyeluruh untuk Berbagai Jaringan Blockchain.
+            Audit Smart Contract Instan dengan AI - Cepat, Handal dan Menyeluruh
+            untuk Berbagai Jaringan Blockchain.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
@@ -49,6 +51,14 @@ export default function Home() {
         </div>
       </main>
 
+      <section>
+        <TextReveal >
+          Tingkatkan Keamanan Smart Contract Anda dan Minimalkan Resiko dalam
+          Bertransaksi
+        </TextReveal>
+      </section>
+      
+      {/* 
       <section
         id="about"
         className="w-full px-8 sm:px-20 py-16 pt-20 relative z-20 bg-muted/5"
@@ -86,7 +96,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section
         id="services"
@@ -101,8 +111,8 @@ export default function Home() {
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Rasakan kekuatan Unmarshal Network, di mana indexing blockchain
-                bertemu dengan desentralisasi. Model Proof of Staked Authority kami
-                memberdayakan anggota komunitas untuk menjalankan indexer,
+                bertemu dengan desentralisasi. Model Proof of Staked Authority
+                kami memberdayakan anggota komunitas untuk menjalankan indexer,
                 meningkatkan keandalan dan kepercayaan.
               </p>
               <Button className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 h-10 group transition-colors">
@@ -129,10 +139,11 @@ export default function Home() {
                   <div className="absolute bottom-8 -left-16 w-6 h-6 bg-muted rounded-full opacity-50"></div>
 
                   {/* Dotted connections */}
-                  <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8">
-                  </div>
+                  <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8"></div>
                   <div className="justify-center items-center flex absolute inset-0">
-                  <SpinningText radius={10}>Smart Contract menjadi lebih terjamin keamanannnya</SpinningText>
+                    <SpinningText radius={10}>
+                      Smart Contract menjadi lebih terjamin keamanannnya
+                    </SpinningText>
                   </div>
                 </div>
               </div>
@@ -149,7 +160,8 @@ export default function Home() {
                 <h3 className="text-lg font-semibold">Indexing Mendalam</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Decoder data terbaik di kelasnya mengekstrak informasi kaya &
-                  mensintesis data on-chain & off-chain untuk mendapatkan makna kontekstual.
+                  mensintesis data on-chain & off-chain untuk mendapatkan makna
+                  kontekstual.
                 </p>
               </CardContent>
             </Card>
@@ -162,7 +174,8 @@ export default function Home() {
                 <h3 className="text-lg font-semibold">Rangkaian API Lengkap</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Unmarshal Indexer melacak setiap bit data yang masuk ke
-                  blockchain dan membantu mengambilnya dengan mudah. Saldo token, dll.
+                  blockchain dan membantu mengambilnya dengan mudah. Saldo
+                  token, dll.
                 </p>
               </CardContent>
             </Card>
@@ -172,7 +185,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Berpusat pada Pelanggan</h3>
+                <h3 className="text-lg font-semibold">
+                  Berpusat pada Pelanggan
+                </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Kami menawarkan bantuan support 24/7 dan channel khusus untuk
                   klien enterprise dengan paket harga yang fleksibel.
