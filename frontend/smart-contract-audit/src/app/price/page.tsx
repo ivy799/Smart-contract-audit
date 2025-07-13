@@ -5,6 +5,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useRouter } from "next/navigation";
 import Background from "../components/Background";
+import { useUser } from "@clerk/nextjs";
+import { SignInButton } from "@clerk/nextjs";
 
 import {
   Card,
@@ -19,11 +21,60 @@ import { Button, buttonVariants } from "@/components/ui/button";
 
 const Home = () => {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useUser();
+
+  const handleButtonClick = () => {
+    if (!isLoaded) return;
+    if (!isSignedIn) {
+      return;
+    }
+
+    // TODO: Implementasi logika setelah login
+  };
+
+  const renderButton = (label: string, isPrimary: boolean = false) => {
+    if (!isLoaded) {
+      return (
+        <Button
+          className={`w-full cursor-pointer ${
+            isPrimary ? "bg-yellow-500 hover:bg-amber-400" : ""
+          }`}
+          disabled
+        >
+          Loading...
+        </Button>
+      );
+    }
+
+    if (!isSignedIn) {
+      return (
+        <SignInButton>
+          <Button
+            className={`w-full cursor-pointer ${
+              isPrimary ? "bg-yellow-500 hover:bg-amber-400" : ""
+            }`}
+          >
+            {label}
+          </Button>
+        </SignInButton>
+      );
+    }
+
+    return (
+      <Button
+        className={`w-full cursor-pointer ${
+          isPrimary ? "bg-yellow-500 hover:bg-amber-400" : ""
+        }`}
+        onClick={handleButtonClick}
+      >
+        {label}
+      </Button>
+    );
+  };
   return (
     <div>
       <Navbar />
       <Background />
-      {/* Choose your plan */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4 pt-12">Pilih Paket Anda</h2>
@@ -60,9 +111,7 @@ const Home = () => {
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
-              <Button className="w-full">Mulai Sekarang</Button>
-            </CardFooter>
+            <CardFooter>{renderButton("Mulai Sekarang")}</CardFooter>
           </Card>
 
           {/* Professional Plan */}
@@ -72,7 +121,9 @@ const Home = () => {
             </div>
             <CardHeader>
               <CardTitle>Profesional</CardTitle>
-              <CardDescription>Terbaik untuk bisnis yang berkembang</CardDescription>
+              <CardDescription>
+                Terbaik untuk bisnis yang berkembang
+              </CardDescription>
               <div className="text-3xl font-bold">Rp99.000,-</div>
             </CardHeader>
             <CardContent className="flex-grow">
@@ -99,9 +150,7 @@ const Home = () => {
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
-              <Button className="w-full bg-yellow-500 hover:bg-amber-400">Mulai Sekarang</Button>
-            </CardFooter>
+            <CardFooter>{renderButton("Mulai Sekarang", true)}</CardFooter>
           </Card>
 
           {/* Enterprise Plan */}
@@ -139,9 +188,7 @@ const Home = () => {
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
-              <Button className="w-full">Mulai Sekarang</Button>
-            </CardFooter>
+            <CardFooter>{renderButton("Mulai Sekarang")}</CardFooter>
           </Card>
         </div>
       </div>
