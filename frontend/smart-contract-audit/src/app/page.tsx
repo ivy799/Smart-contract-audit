@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { AnimatedGridPatternDemo } from "./components/GridPattern";
+import { SpinningText } from "@/components/magicui/spinning-text";
 export default function Home() {
   const router = useRouter();
   return (
@@ -128,22 +129,10 @@ export default function Home() {
                   <div className="absolute bottom-8 -left-16 w-6 h-6 bg-muted rounded-full opacity-50"></div>
 
                   {/* Dotted connections */}
-                  <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8"></div>
-                </div>
-
-                {/* Dashboard mockup */}
-                <div className="absolute bottom-4 right-4 bg-card border rounded-lg p-4 shadow-lg">
-                  <div className="text-sm text-muted-foreground mb-1">
-                    0x437...59f1
+                  <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8">
                   </div>
-                  <div className="text-2xl font-bold">$4,546</div>
-                  <div className="flex gap-2 mt-2">
-                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-black">+</span>
-                    </div>
-                    <div className="w-6 h-6 bg-muted rounded flex items-center justify-center">
-                      <ArrowRight className="w-3 h-3" />
-                    </div>
+                  <div className="justify-center items-center flex absolute inset-0">
+                  <SpinningText radius={10}>Smart Contract menjadi lebih terjamin keamanannnya</SpinningText>
                   </div>
                 </div>
               </div>
