@@ -25,11 +25,11 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight tracking-[-.02em]">
-            Audit Smart Contract Terpercaya dan Reliabel
+            <i>Audit Smart Contract</i> Terpercaya dan Reliabel
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Audit Smart Contract Instan dengan AI - Cepat, Handal dan Menyeluruh
-            untuk Berbagai Jaringan Blockchain.
+            <b>Percaya</b> Sebelum Anda Berinvestasi. <br />
+            <b>Verifikasi</b> Sebelum Anda Meluncurkan.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
