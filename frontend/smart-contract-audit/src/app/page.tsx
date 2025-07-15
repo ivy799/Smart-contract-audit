@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Zap, Users, Cloud } from "lucide-react";
+import { ArrowRight, Database, Zap, Users, Cloud, Lightbulb, LightbulbIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
@@ -139,26 +139,31 @@ export default function Home() {
                   <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8"></div>
                   <div className="justify-center items-center flex absolute inset-0">
                     <SpinningText radius={10}>
-                      Smart Contract menjadi lebih terjamin keamanannnya
+                      Zectra: Kepercayaan Terverifikasi.
                     </SpinningText>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
+          <h2 className = "text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mt-5 mb-5 text-foreground">
+            Layanan Analisis Smart Contract Cerdas <b className="bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Zectra</b>
+          </h2>
+          <p className="text-base sm:text-xs md:text-sm text-muted-foreground mx-auto leading-relaxed mb-14 text-center max-w-4xl">
+            <b>Zectra</b> menghadirkan generasi baru analisa keamanan smart contract Web3. Menggabungkan Analisa Statis dan AI yang <i>canggih</i>, memberikan wawasan kontekstual smart contract yang lebih <b><i>dalam, cepat dan akurat.</i></b>
+          </p>
           {/* Service Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
               <CardContent className="p-6 space-y-4">
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-yellow-400" />
+                  <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Indexing Mendalam</h3>
+                <h3 className="text-lg font-semibold">Instan</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Decoder data terbaik di kelasnya mengekstrak informasi kaya &
-                  mensintesis data on-chain & off-chain untuk mendapatkan makna
-                  kontekstual.
+                  Cara termudah untuk memeriksa keamanan sebuah token sebelum Anda berinteraksi atau berinvestasi. 
+                  Cukup masukkan alamat token atau unggah kode.
+                  Dan biarkan mesin kami bekerja
                 </p>
               </CardContent>
             </Card>
@@ -197,11 +202,16 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Cloud className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">SaaS Sejati</h3>
+                <h3 className="text-lg font-semibold">Efisiensi Biaya dan<br />  Waktu Pengembangan</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer melacak setiap bit data yang masuk ke
-                  blockchain dan membantu mengambilnya dengan mudah.
+                  Temukan dan perbaiki kerentanan sejak dini dalam siklus pengembangan, 
+                  jauh sebelum menjadi masalah yang mahal untuk diperbaiki.
                 </p>
+
+                <div className="flex flex-wrap gap-2 my-6">
+                                <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20">Devs</span>
+                                <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-yellow-400/80 border border-white/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]">Enterprise</span>
+                            </div>
               </CardContent>
             </Card>
           </div>
