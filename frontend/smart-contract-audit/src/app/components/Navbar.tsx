@@ -38,7 +38,7 @@ const Navbar = () => {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
-                onClick={() => router.push("/#about")}
+                onClick={() => router.push("/about")}
                 className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
               >
                 Tentang

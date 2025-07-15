@@ -123,3 +123,31 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Marquee animations */
+@keyframes marquee {
+  from { transform: translateX(0%) }
+  to { transform: translateX(-100%) }
+}
+
+@keyframes marquee-vertical {
+  from { transform: translateY(0%) }
+  to { transform: translateY(-100%) }
+}
+
+@keyframes marquee-reverse {
+  from { transform: translateX(0%) }
+  to { transform: translateX(100%) }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 40s) linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse var(--duration, 40s) linear infinite;
+}

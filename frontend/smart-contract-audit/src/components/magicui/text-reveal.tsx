@@ -31,7 +31,7 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
         <span
           ref={targetRef}
           className={
-            "flex flex-wrap justify-center p-5 text-4xl font-bold text-black/20 dark:text-white/20 md:p-8 md:text-2xl lg:p-10 lg:text-3xl xl:text-4xl"
+            "flex flex-wrap justify-center p-5 text-4xl font-bold text-black/20 dark:text-white/20 md:p-8 md:text-2xl lg:p-9 lg:text-4xl xl:text-5xl"
           }
         >
           {words.map((word, i) => {
