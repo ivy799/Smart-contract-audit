@@ -33,7 +33,7 @@ const Navbar = () => {
                 onClick={() => router.push("/")}
                 className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
               >
-                Home
+                Beranda
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
@@ -41,7 +41,7 @@ const Navbar = () => {
                 onClick={() => router.push("/#about")}
                 className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
               >
-                About
+                Tentang
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
@@ -49,7 +49,7 @@ const Navbar = () => {
                 onClick={() => router.push("/analyze")}
                 className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
               >
-                Service
+                Layanan
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
@@ -57,7 +57,7 @@ const Navbar = () => {
                 onClick={() => router.push("/price")}
                 className="text-muted-foreground hover:text-foreground transition-colors px-4 py-2 text-sm font-medium cursor-pointer"
               >
-                Pricing
+                Langganan
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>

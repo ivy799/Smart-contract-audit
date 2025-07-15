@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Zap, Users, Cloud } from "lucide-react";
+import { ArrowRight, Database, Zap, Users, Cloud, Lightbulb, LightbulbIcon, HandCoins } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
@@ -24,19 +24,19 @@ export default function Home() {
         className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35"
       >
         <div className="max-w-4xl mx-auto space-y-8">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight tracking-[-.02em]">
-            Audit Smart Contract Paling Terpercaya
+          <h1 className="text-4xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-[-.02em] text-gray-300">
+            <b className="bg-purple-500 bg-clip-text text-transparent">Percaya</b> Sebelum Anda <b className="bg-blue-700 bg-clip-text text-transparent">Berinvestasi</b> <br />
+            <b className="bg-purple-500 bg-clip-text text-transparent">Verifikasi</b> Sebelum Anda <b className="bg-blue-700 bg-clip-text text-transparent">Meluncurkan</b>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Audit Smart Contract Instan dengan AI - Cepat, Handal dan Menyeluruh
-            untuk Berbagai Jaringan Blockchain.
+            
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
               size="lg"
               className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 h-12 transition-colors"
             >
-              MULAI SEKARANG
+              JELAJAHI
             </Button>
             <Button
               onClick={() => router.push("/analyze")}
@@ -44,7 +44,7 @@ export default function Home() {
               variant="outline"
               className="rounded-full px-8 py-3 h-12 group transition-colors font-medium bg-transparent"
             >
-              COBA GRATIS
+              PERIKSA RISIKO SEKARANG
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -52,9 +52,9 @@ export default function Home() {
       </main>
 
       <section>
-        <TextReveal >
-          Tingkatkan Keamanan Smart Contract Anda dan Minimalkan Resiko dalam
-          Bertransaksi
+        <TextReveal>
+          Layanan Audit Smart Contract instan untuk analisa secara general maupun mendalam untuk proyek Web3.
+          Zectra melindungi Anda dari kedua sisi.
         </TextReveal>
       </section>
       
@@ -107,13 +107,10 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div className="space-y-6">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                Gateway Anda untuk Indexing Data Blockchain Tingkat Lanjut
+                <b className="bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Zectra</b>
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Rasakan kekuatan Unmarshal Network, di mana indexing blockchain
-                bertemu dengan desentralisasi. Model Proof of Staked Authority
-                kami memberdayakan anggota komunitas untuk menjalankan indexer,
-                meningkatkan keandalan dan kepercayaan.
+                Zectra adalah platform keamanan Web3 yang memberdayakan investor dan pengguna. Gunakan analisa gratis kami untuk memeriksa risiko keamanan token sebelum berinvestasi dan hindari penipuan. Jadilah investor yang lebih cerdas dengan Zectra.
               </p>
               <Button className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 h-10 group transition-colors">
                 JELAJAHI
@@ -142,27 +139,34 @@ export default function Home() {
                   <div className="absolute inset-0 border-2 border-dotted border-yellow-400/30 rounded-full w-32 h-32 -translate-x-8 -translate-y-8"></div>
                   <div className="justify-center items-center flex absolute inset-0">
                     <SpinningText radius={10}>
-                      Smart Contract menjadi lebih terjamin keamanannnya
+                      Zectra: Kepercayaan Terverifikasi.
                     </SpinningText>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
+          <h2 className = "text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mt-5 mb-5 text-foreground">
+            Layanan Analisis Smart Contract Cerdas <b className="bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Zectra</b>
+          </h2>
+          <p className="text-base sm:text-xs md:text-sm text-muted-foreground mx-auto leading-relaxed mb-14 text-center max-w-4xl">
+            <b>Zectra</b> menghadirkan generasi baru analisa keamanan smart contract Web3. Menggabungkan Analisa Statis dan AI yang <i>canggih</i>, memberikan wawasan kontekstual smart contract yang lebih <b><i>dalam, cepat dan akurat.</i></b>
+          </p>
           {/* Service Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
               <CardContent className="p-6 space-y-4">
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Database className="w-6 h-6 text-yellow-400" />
+                  <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Indexing Mendalam</h3>
+                <h3 className="text-lg font-semibold">Analisis Instan, Hasil dalam Hitungan Menit</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Decoder data terbaik di kelasnya mengekstrak informasi kaya &
-                  mensintesis data on-chain & off-chain untuk mendapatkan makna
-                  kontekstual.
+                  Lupakan proses audit manual yang memakan waktu berminggu-minggu. 
+                  Dengan Zectra, Anda bisa mendapatkan analisis yang mendalam untuk seluruh basis kode Anda dalam hitungan menit. 
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
@@ -171,12 +175,13 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Rangkaian API Lengkap</h3>
+                <h3 className="text-lg font-semibold">Akurasi Deteksi dengan Trained AI</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer melacak setiap bit data yang masuk ke
-                  blockchain dan membantu mengambilnya dengan mudah. Saldo
-                  token, dll.
+                  Zectra menggunakan Analisis Statis dan AI yang dikembangkan untuk memahami konteks kode sehingga kami dapat menemukan kerentanan yang lebih kompleks.
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
@@ -189,22 +194,30 @@ export default function Home() {
                   Berpusat pada Pelanggan
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Kami menawarkan bantuan support 24/7 dan channel khusus untuk
-                  klien enterprise dengan paket harga yang fleksibel.
+                  Zectra memberikan ringkasan eksekutif yang mudah dipahami,
+                  sehingga Anda dapat dengan cepat memahami risiko dan tindakan yang diperlukan.
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
               <CardContent className="p-6 space-y-4">
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Cloud className="w-6 h-6 text-yellow-400" />
+                  <HandCoins className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">SaaS Sejati</h3>
+                <h3 className="text-lg font-semibold">Efisiensi Biaya dan<br />  Waktu Pengembangan</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer melacak setiap bit data yang masuk ke
-                  blockchain dan membantu mengambilnya dengan mudah.
+                  Temukan dan perbaiki kerentanan sejak dini dalam siklus pengembangan, 
+                  jauh sebelum menjadi masalah yang mahal untuk diperbaiki.
                 </p>
+
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-blue-400/80 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Devs</span>
+                    <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-yellow-400/80 border border-white/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]">Enterprise</span>
+                </div>
               </CardContent>
             </Card>
           </div>
