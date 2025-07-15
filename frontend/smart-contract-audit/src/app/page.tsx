@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Zap, Users, Cloud, Lightbulb, LightbulbIcon } from "lucide-react";
+import { ArrowRight, Database, Zap, Users, Cloud, Lightbulb, LightbulbIcon, HandCoins } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
@@ -25,8 +25,8 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-[-.02em] text-gray-300">
-            <b className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Percaya</b> Sebelum Anda <b className="bg-gradient-to-r from-cyan-400 to-blue-700 bg-clip-text text-transparent">Berinvestasi</b> <br />
-            <b className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Verifikasi</b> Sebelum Anda <b className="bg-gradient-to-r from-cyan-400 to-blue-700 bg-clip-text text-transparent">Meluncurkan</b>
+            <b className="bg-purple-500 bg-clip-text text-transparent">Percaya</b> Sebelum Anda <b className="bg-blue-700 bg-clip-text text-transparent">Berinvestasi</b> <br />
+            <b className="bg-purple-500 bg-clip-text text-transparent">Verifikasi</b> Sebelum Anda <b className="bg-blue-700 bg-clip-text text-transparent">Meluncurkan</b>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
             
@@ -159,12 +159,14 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Instan</h3>
+                <h3 className="text-lg font-semibold">Analisis Instan, Hasil dalam Hitungan Menit</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Cara termudah untuk memeriksa keamanan sebuah token sebelum Anda berinteraksi atau berinvestasi. 
-                  Cukup masukkan alamat token atau unggah kode.
-                  Dan biarkan mesin kami bekerja
+                  Lupakan proses audit manual yang memakan waktu berminggu-minggu. 
+                  Dengan Zectra, Anda bisa mendapatkan analisis yang mendalam untuk seluruh basis kode Anda dalam hitungan menit. 
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
@@ -173,12 +175,13 @@ export default function Home() {
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
                   <Zap className="w-6 h-6 text-yellow-400" />
                 </div>
-                <h3 className="text-lg font-semibold">Rangkaian API Lengkap</h3>
+                <h3 className="text-lg font-semibold">Akurasi Deteksi dengan Trained AI</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Unmarshal Indexer melacak setiap bit data yang masuk ke
-                  blockchain dan membantu mengambilnya dengan mudah. Saldo
-                  token, dll.
+                  Zectra menggunakan Analisis Statis dan AI yang dikembangkan untuk memahami konteks kode sehingga kami dapat menemukan kerentanan yang lebih kompleks.
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
@@ -191,16 +194,19 @@ export default function Home() {
                   Berpusat pada Pelanggan
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Kami menawarkan bantuan support 24/7 dan channel khusus untuk
-                  klien enterprise dengan paket harga yang fleksibel.
+                  Zectra memberikan ringkasan eksekutif yang mudah dipahami,
+                  sehingga Anda dapat dengan cepat memahami risiko dan tindakan yang diperlukan.
                 </p>
+                <div className="flex flex-wrap gap-2 my-6">
+                    <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Basic</span> 
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
               <CardContent className="p-6 space-y-4">
                 <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Cloud className="w-6 h-6 text-yellow-400" />
+                  <HandCoins className="w-6 h-6 text-yellow-400" />
                 </div>
                 <h3 className="text-lg font-semibold">Efisiensi Biaya dan<br />  Waktu Pengembangan</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -209,9 +215,9 @@ export default function Home() {
                 </p>
 
                 <div className="flex flex-wrap gap-2 my-6">
-                                <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20">Devs</span>
-                                <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-yellow-400/80 border border-white/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]">Enterprise</span>
-                            </div>
+                    <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-blue-400/80 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">Devs</span>
+                    <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-yellow-400/80 border border-white/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]">Enterprise</span>
+                </div>
               </CardContent>
             </Card>
           </div>
