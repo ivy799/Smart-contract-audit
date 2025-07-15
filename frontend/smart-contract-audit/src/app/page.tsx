@@ -11,7 +11,7 @@ import {
   LightbulbIcon,
   HandCoins,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 
 import Navbar from "./components/Navbar";
@@ -20,13 +20,14 @@ import { AnimatedGridPatternDemo } from "./components/GridPattern";
 import { SpinningText } from "@/components/magicui/spinning-text";
 import { TextReveal } from "@/components/magicui/text-reveal";
 import { MarqueeDemo } from "./components/Review";
+import { BorderBeam } from "@/components/magicui/border-beam";
+import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
 export default function Home() {
   const router = useRouter();
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative font-[family-name:var(--font-geist-sans)]">
       <AnimatedGridPatternDemo />
-
       <Navbar />
 
       <main
@@ -61,19 +62,23 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
               size="lg"
-              className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 h-12 transition-colors"
+              className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 h-12 "
             >
               JELAJAHI
             </Button>
-            <Button
+            <ShimmerButton
               onClick={() => router.push("/analyze")}
-              size="lg"
-              variant="outline"
-              className="rounded-full px-8 py-3 h-12 group transition-colors font-medium bg-transparent"
+              className="shadow-2xl"
             >
-              PERIKSA RISIKO SEKARANG
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
+              <BorderBeam className="from-yellow-500 to-transparent"/>
+              <BorderBeam className="from-yellow-500 to-transparent" delay={3}/>
+              <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                PERIKSA RESIKO SEKARANG 
+              </span>
+              
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform fill-white" />
+              
+            </ShimmerButton>
           </div>
         </div>
       </main>
@@ -289,8 +294,88 @@ export default function Home() {
         </div>
       </section>
 
-      
-      <MarqueeDemo/>
+      <section
+        id="reviews"
+        className="w-full px-8 sm:px-20 py-10 relative z-20"
+      >
+        <h1 className="text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mt-5 mb-5 text-foreground">
+          Ulasan Pengguna{" "}
+          <b className="bg-yellow-500 bg-clip-text text-transparent">Zectra</b>
+        </h1>
+        <MarqueeDemo />
+      </section>
+
+      <section
+        id="contact"
+        className="w-full px-8 sm:px-20 py-16 relative z-20 bg-muted/5"
+      >
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+              Hubungi{" "}
+              <b className="bg-yellow-500 bg-clip-text text-transparent">
+                Kami
+              </b>
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Kami di Zectra selalu siap membantu Anda. Jika Anda memiliki
+              pertanyaan, ingin memberikan umpan balik, atau membutuhkan
+              bantuan, jangan ragu untuk menghubungi kami.
+            </p>
+          </div>
+
+          <Card className="max-w-2xl mx-auto bg-card/80 border-border relative overflow-hidden">
+            <BorderBeam size={250} duration={12} />
+            <BorderBeam delay={6} size={400} duration={12} />
+            <CardContent className="p-8">
+              <h3 className="text-xl font-semibold mb-6 text-left">
+                Kirim Pesan
+              </h3>
+              <form className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Nama Anda"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-colors"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Anda"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-colors"
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Subjek"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-colors"
+                />
+                <textarea
+                  placeholder="Pesan Anda"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 resize-none transition-colors"
+                />
+              </form>
+            </CardContent>
+            <CardFooter className="px-8 pb-8 pt-0">
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <Button
+                  type="submit"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold flex-1 rounded-full h-12 transition-colors"
+                >
+                  KIRIM PESAN
+                </Button>
+                <Button
+                  variant="outline"
+                  className="group flex-1 rounded-full h-12 bg-transparent transition-colors"
+                >
+                  DETAIL KONTAK
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
+      </section>
 
       <Footer />
     </div>

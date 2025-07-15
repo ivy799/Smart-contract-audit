@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/toggle";
 import { UserButton } from "@clerk/nextjs";
+import { ScrollProgress } from "@/components/magicui/scroll-progress";
 
 const Navbar = () => {
   const router = useRouter();
@@ -68,6 +69,7 @@ const Navbar = () => {
           <UserButton afterSignOutUrl="/" />
         </div>
       </nav>
+      <ScrollProgress/>
     </header>
   );
 };
