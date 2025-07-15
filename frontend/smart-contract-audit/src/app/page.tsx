@@ -24,19 +24,19 @@ export default function Home() {
         className="flex-1 flex flex-col items-center justify-center px-8 sm:px-20 text-center relative z-20 pt-16 mt-35"
       >
         <div className="max-w-4xl mx-auto space-y-8">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight tracking-[-.02em]">
-            <i>Audit Smart Contract</i> Terpercaya dan Reliabel
+          <h1 className="text-4xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-[-.02em] text-gray-300">
+            <b className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Percaya</b> Sebelum Anda <b className="bg-gradient-to-r from-cyan-400 to-blue-700 bg-clip-text text-transparent">Berinvestasi</b> <br />
+            <b className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Verifikasi</b> Sebelum Anda <b className="bg-gradient-to-r from-cyan-400 to-blue-700 bg-clip-text text-transparent">Meluncurkan</b>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            <b>Percaya</b> Sebelum Anda Berinvestasi. <br />
-            <b>Verifikasi</b> Sebelum Anda Meluncurkan.
+            
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
               size="lg"
               className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 h-12 transition-colors"
             >
-              MULAI SEKARANG
+              JELAJAHI
             </Button>
             <Button
               onClick={() => router.push("/analyze")}
@@ -52,9 +52,9 @@ export default function Home() {
       </main>
 
       <section>
-        <TextReveal >
-          Tingkatkan Keamanan Smart Contract Anda dan Minimalkan Resiko dalam
-          Bertransaksi
+        <TextReveal>
+          Layanan Audit Smart Contract instan untuk analisa secara general maupun mendalam untuk proyek Web3.
+          Zectra melindungi Anda dari kedua sisi.
         </TextReveal>
       </section>
       
