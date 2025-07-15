@@ -44,7 +44,7 @@ export default function Home() {
               variant="outline"
               className="rounded-full px-8 py-3 h-12 group transition-colors font-medium bg-transparent"
             >
-              COBA GRATIS
+              PERIKSA RISIKO SEKARANG
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -107,13 +107,10 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div className="space-y-6">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                Gateway Anda untuk Indexing Data Blockchain Tingkat Lanjut
+                <b className="bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent">Zectra</b>
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Rasakan kekuatan Unmarshal Network, di mana indexing blockchain
-                bertemu dengan desentralisasi. Model Proof of Staked Authority
-                kami memberdayakan anggota komunitas untuk menjalankan indexer,
-                meningkatkan keandalan dan kepercayaan.
+                Zectra adalah platform keamanan Web3 yang memberdayakan investor dan pengguna. Gunakan analisa gratis kami untuk memeriksa risiko keamanan token sebelum berinvestasi dan hindari penipuan. Jadilah investor yang lebih cerdas dengan Zectra.
               </p>
               <Button className="rounded-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-2 h-10 group transition-colors">
                 JELAJAHI
