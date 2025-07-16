@@ -51,13 +51,13 @@ export default function Home() {
             <b className="bg-blue-700 bg-clip-text text-transparent">
               Meluncurkan
             </b> */}
-            Amankan Smart Contract Anda Bersama{" "}
+            Analisa Smart Contract Anda Bersama{" "}
             <b className=" bg-yellow-500 bg-clip-text text-transparent">
               Zectra
             </b>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Percaya Sebelum Anda Investasi, Verifikasi Sebelum Anda Meluncurkan.
+            Percaya Sebelum Anda Investasi,<br /> Verifikasi Sebelum Anda Meluncurkan.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
