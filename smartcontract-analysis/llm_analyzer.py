@@ -122,7 +122,12 @@ async def _call_llm_api(prompt: str, timeout: int=180) -> Dict[str, Any]:
     
     result_text = response_json['candidates'][0]['content']['parts'][0]['text']
     logger.info(f"Respons mentah dari LLM: {result_text}")
-    return json.loads(result_text)
+
+    try:
+        return json.loads(result_text)
+    except json.JSONDecodeError as e:
+        logger.error(f"Gagal mengurai respons JSON dari LLM: {e}")
+        raise ValueError(f"Respons LLM tidak dalam format JSON yang valid. {result_text}")
 
 async def run_analysis(full_input_json: Dict[str, Any]) -> LLMAnalysisResult:
     """
@@ -154,25 +159,38 @@ async def generate_recommendations(static_findings: List[Dict[str, Any]]) -> LLM
     logger.info(f"Memulai proses rekomendasi LLM untuk {len(static_findings)} temuan...")
     all_recommendations = []
     chunk_size = 5
+    max_retries = 3
+
+    total_chunks = (len(static_findings) + chunk_size - 1) // chunk_size
 
     for i in range(0, len(static_findings), chunk_size):
         chunk = static_findings[i:(i + chunk_size)]
-        logger.info(f"Memproses kelompok {i//chunk_size + 1} ({len(chunk)} temuan)...")
+        current_chunk_num = (i // chunk_size) + 1
+        logger.info(f"Memproses kelompok {current_chunk_num} dari {total_chunks} ({len(chunk)} temuan)...")
 
-        static_findings_str = json.dumps(chunk, indent=2)
-        prompt = RECOMMENDATION_SYSTEM_PROMPT.format(static_findings_str=static_findings_str)
+        for attempt in range(max_retries):
+            try:
+                static_findings_str = json.dumps(chunk, indent=2)
+                prompt = RECOMMENDATION_SYSTEM_PROMPT.format(static_findings_str=static_findings_str)
     
-        try:
-            recommendation_data = await _call_llm_api(prompt)
+                recommendation_data = await _call_llm_api(prompt)
             
-            validated_report = LLMRecommendationResult(**recommendation_data)
-            all_recommendations.extend(validated_report.recommendations)
-            
-            await asyncio.sleep(1) 
+                validated_report = LLMRecommendationResult(**recommendation_data)
+                all_recommendations.extend(validated_report.recommendations)
 
-        except Exception as e:
-            logger.error(f"Gagal memproses kelompok {i//chunk_size + 1}: {e}")
-            continue
+                logger.info(f"Kelompok {current_chunk_num} berhasil pada percobaan ke-{attempt + 1}.")
+                break
+
+            except Exception as e:
+                logger.warning(f"Percobaan ke-{attempt + 1} untuk kelompok {current_chunk_num} gagal: {e}")
+                if attempt < max_retries - 1:
+                    logger.info(f"Mencoba ulang...")
+                    await asyncio.sleep(2)
+                else:
+                    logger.error(f"Kelompok {current_chunk_num} gagal setelah {max_retries} percobaan. Error: {e}")
+
+        if i + chunk_size < len(static_findings):
+            await asyncio.sleep(1)
     
     logger.info(f"Total rekomendasi yang berhasil dibuat: {len(all_recommendations)}")
     if not all_recommendations and static_findings:
