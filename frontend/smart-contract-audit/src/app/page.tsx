@@ -57,7 +57,8 @@ export default function Home() {
             </b>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-[family-name:var(--font-geist-sans)]">
-            Percaya Sebelum Anda Investasi,<br /> Verifikasi Sebelum Anda Meluncurkan.
+            Percaya Sebelum Anda Investasi,
+            <br /> Verifikasi Sebelum Anda Meluncurkan.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Button
@@ -70,14 +71,16 @@ export default function Home() {
               onClick={() => router.push("/analyze")}
               className="shadow-2xl"
             >
-              <BorderBeam className="from-yellow-500 to-transparent"/>
-              <BorderBeam className="from-yellow-500 to-transparent" delay={3}/>
+              <BorderBeam className="from-yellow-500 to-transparent" />
+              <BorderBeam
+                className="from-yellow-500 to-transparent"
+                delay={3}
+              />
               <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
-                PERIKSA RESIKO SEKARANG 
+                PERIKSA RESIKO SEKARANG
               </span>
-              
+
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform fill-white" />
-              
             </ShimmerButton>
           </div>
         </div>
@@ -184,111 +187,140 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <h2 className="text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mt-5 mb-5 text-foreground">
-            Layanan Analisis Smart Contract Cerdas{" "}
-            <b className="bg-yellow-500 bg-clip-text text-transparent">
-              Zectra
-            </b>
-          </h2>
-          <p className="text-base sm:text-xs md:text-sm text-muted-foreground mx-auto leading-relaxed mb-14 text-center max-w-4xl">
-            <b>Zectra</b> menghadirkan generasi baru analisa keamanan smart
-            contract Web3. Menggabungkan Analisa Statis dan AI yang{" "}
-            <i>canggih</i>, memberikan wawasan kontekstual smart contract yang
-            lebih{" "}
-            <b>
-              <i>dalam, cepat dan akurat.</i>
-            </b>
-          </p>
-          {/* Service Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-yellow-400" />
-                </div>
-                <h3 className="text-lg font-semibold">
-                  Analisis Instan, Hasil dalam Hitungan Menit
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Lupakan proses audit manual yang memakan waktu
-                  berminggu-minggu. Dengan Zectra, Anda bisa mendapatkan
-                  analisis yang mendalam untuk seluruh basis kode Anda dalam
-                  hitungan menit.
-                </p>
-                <div className="flex flex-wrap gap-2 my-6">
-                  <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">
-                    Basic
-                  </span>
+          {/* Services Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-foreground">
+              Layanan Analisis Smart Contract{" "}
+              <span className="bg-yellow-500 bg-clip-text text-transparent">
+                Zectra
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              <strong>Zectra</strong> menghadirkan generasi baru analisa keamanan smart contract Web3. 
+              Menggabungkan Analisa Statis dan AI yang canggih, memberikan wawasan kontekstual 
+              smart contract yang lebih <strong><em>dalam, cepat dan akurat.</em></strong>
+            </p>
+          </div>
+
+          {/* Service Cards Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Primary Services Row */}
+            <Card className="group bg-card/50 border-border hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <CardContent className="p-8 space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-400/30 transition-colors">
+                    <Zap className="w-7 h-7 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">
+                      Analisis Instan & Cepat
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Lupakan proses audit manual yang memakan waktu berminggu-minggu. 
+                      Dengan Zectra, dapatkan analisis mendalam untuk seluruh basis kode 
+                      dalam hitungan menit.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
+              <CardFooter className="px-8 pb-8">
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-xs font-medium border border-green-500/20">
+                    Instant
+                  </span>
+                  <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium border border-blue-500/20">
+                    All Plans
+                  </span>
+                </div>
+              </CardFooter>
             </Card>
 
-            <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-yellow-400" />
-                </div>
-                <h3 className="text-lg font-semibold">
-                  Akurasi Deteksi dengan Trained AI
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Zectra menggunakan Analisis Statis dan AI yang dikembangkan
-                  untuk memahami konteks kode sehingga kami dapat menemukan
-                  kerentanan yang lebih kompleks.
-                </p>
-                <div className="flex flex-wrap gap-2 my-6">
-                  <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">
-                    Basic
-                  </span>
+            <Card className="group bg-card/50 border-border hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <CardContent className="p-8 space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-400/30 transition-colors">
+                    <Lightbulb className="w-7 h-7 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">
+                      AI-Powered Detection
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Menggunakan Analisis Statis dan AI terlatih untuk memahami 
+                      konteks kode dan menemukan kerentanan kompleks yang tersembunyi.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
+              <CardFooter className="px-8 pb-8">
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-full text-xs font-medium border border-purple-500/20">
+                    AI-Powered
+                  </span>
+                  <span className="px-3 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-full text-xs font-medium border border-orange-500/20">
+                    Advanced
+                  </span>
+                </div>
+              </CardFooter>
             </Card>
 
-            <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-yellow-400" />
-                </div>
-                <h3 className="text-lg font-semibold">
-                  Berpusat pada Pelanggan
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Zectra memberikan ringkasan eksekutif yang mudah dipahami,
-                  sehingga Anda dapat dengan cepat memahami risiko dan tindakan
-                  yang diperlukan.
-                </p>
-                <div className="flex flex-wrap gap-2 my-6">
-                  <span className="px-3 py-1 text-gray-400 rounded-full text-sm backdrop-blur-sm bg-white/10 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">
-                    Basic
-                  </span>
+            {/* Secondary Services Row */}
+            <Card className="group bg-card/50 border-border hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <CardContent className="p-8 space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-400/30 transition-colors">
+                    <Users className="w-7 h-7 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">
+                      User-Centric Reports
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Ringkasan eksekutif yang mudah dipahami, membantu Anda 
+                      memahami risiko dan tindakan yang diperlukan dengan cepat.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
+              <CardFooter className="px-8 pb-8">
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-full text-xs font-medium border border-cyan-500/20">
+                    User-Friendly
+                  </span>
+                  <span className="px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full text-xs font-medium border border-teal-500/20">
+                    Detailed
+                  </span>
+                </div>
+              </CardFooter>
             </Card>
 
-            <Card className="bg-card/50 border-border hover:bg-card/80 transition-colors">
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <HandCoins className="w-6 h-6 text-yellow-400" />
+            <Card className="group bg-card/50 border-border hover:bg-card/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              <CardContent className="p-8 space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-yellow-400/20 rounded-xl flex items-center justify-center group-hover:bg-yellow-400/30 transition-colors">
+                    <HandCoins className="w-7 h-7 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">
+                      Cost & Time Efficiency
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Temukan dan perbaiki kerentanan sejak dini dalam siklus 
+                      pengembangan, sebelum menjadi masalah yang mahal diperbaiki.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold">
-                  Efisiensi Biaya dan
-                  <br /> Waktu Pengembangan
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Temukan dan perbaiki kerentanan sejak dini dalam siklus
-                  pengembangan, jauh sebelum menjadi masalah yang mahal untuk
-                  diperbaiki.
-                </p>
-
-                <div className="flex flex-wrap gap-2 my-6">
-                  <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-blue-400/80 border border-white/20 shadow-[0_0_10px_rgba(243,244,246,0.5)]">
-                    Devs
+              </CardContent>
+              <CardFooter className="px-8 pb-8">
+                <div className="flex gap-2">
+                  <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium border border-blue-500/20">
+                    Developers
                   </span>
-                  <span className="px-3 py-1 text-white rounded-full text-sm backdrop-blur-sm bg-yellow-400/80 border border-white/20 shadow-[0_0_10px_rgba(250,204,21,0.8)]">
+                  <span className="px-3 py-1 bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 rounded-full text-xs font-medium border border-yellow-400/30">
                     Enterprise
                   </span>
                 </div>
-              </CardContent>
+              </CardFooter>
             </Card>
           </div>
         </div>
