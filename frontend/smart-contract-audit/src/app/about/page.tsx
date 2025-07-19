@@ -86,10 +86,10 @@ const About = () => {
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Platform analisis keamanan inovatid yang  dirancang untuk memperkuat ekosistem Web3. 
-            Proyek ini dibangun dengan pendekatan hybrid, menggunakan kecepatan dan ketepatan analisis statis dengan kedalaman dan kecerdasan analisis kontekstual yang didukung oleh Large Language Model (LLM).
-            Kami tidak hanya mengidentifikasi kerentanan umum tetapi juga menggali lebih dalam untuk menemukan celah logika bisnis, 
-            risiko ekonomi, dan masalah sentralisasi yang seringkali terlewat oleh analisa otomatis biasa. 
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Adipisci
+            incidunt dolor sequi! Repudiandae delectus saepe explicabo sed
+            sapiente ad aliquid, dolores repellat qui tenetur perspiciatis,
+            blanditiis debitis quae culpa libero.
           </p>
         </div>
       </section>
